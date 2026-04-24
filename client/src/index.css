@@ -10,12 +10,29 @@
         /* Thin branded scrollbar (Firefox) */
         scrollbar-width: thin;
         scrollbar-color: #ff7a00 transparent;
+        font-size: 15px; /* slightly tighter base size for a modern SaaS feel */
     }
+    @media (min-width: 1024px) { html { font-size: 16px; } }
+
     body {
         @apply font-sans text-ink bg-white antialiased;
         overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-feature-settings: 'cv11', 'ss01', 'ss03';
+        letter-spacing: -0.01em;
     }
-    h1, h2, h3, h4 { @apply font-display; }
+
+    /* Headings: Plus Jakarta Sans, tight tracking, heavier weight */
+    h1, h2, h3, h4 {
+        @apply font-display;
+        letter-spacing: -0.025em;
+        line-height: 1.08;
+    }
+    h5, h6 {
+        @apply font-display;
+        letter-spacing: -0.02em;
+    }
     :focus-visible {
         outline: 3px solid theme('colors.brand.500');
         outline-offset: 3px;
@@ -95,10 +112,16 @@
     }
 
     .eyebrow {
-        @apply inline-block text-[11px] tracking-[2px] uppercase font-semibold text-brand-500 mb-3;
+        @apply inline-flex items-center gap-2 text-[11px] tracking-[2.5px] uppercase font-semibold text-brand-500 mb-3;
+    }
+    .eyebrow::before {
+        content: '';
+        @apply block w-6 h-[1.5px] bg-brand-500;
     }
     .section-title {
-        @apply font-display text-[30px] sm:text-4xl md:text-[42px] font-extrabold text-ink leading-[1.15];
+        @apply font-display text-[28px] sm:text-[34px] md:text-[42px] lg:text-[48px] font-extrabold text-ink;
+        letter-spacing: -0.03em;
+        line-height: 1.05;
     }
     .script {
         @apply font-script text-brand-500 font-bold;

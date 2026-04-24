@@ -30,9 +30,17 @@ export default {
                 accent: '#ffd166',
             },
             fontFamily: {
-                sans: ['Poppins', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
-                display: ['"Playfair Display"', 'Georgia', 'serif'],
+                // Modern sans-serif stack — inspired by PickYourTrail / Airbnb / Booking.
+                // `Inter` for body and most UI text (tight, clean, optimized for screens).
+                // `Plus Jakarta Sans` for headlines (geometric, slightly warmer).
+                // `Dancing Script` kept only for rare accent / quoted script.
+                sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+                display: ['"Plus Jakarta Sans"', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
                 script: ['"Dancing Script"', 'cursive'],
+            },
+            letterSpacing: {
+                'tight-x': '-0.02em',
+                'tighter-x': '-0.035em',
             },
             boxShadow: {
                 soft: '0 6px 16px rgba(10,15,40,0.06)',

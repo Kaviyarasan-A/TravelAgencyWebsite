@@ -17,6 +17,8 @@ import GoogleReviews from '../components/GoogleReviews.jsx';
 import { AdHero, AdInline } from '../components/AdBanner.jsx';
 import AmbientBackdrop from '../components/AmbientBackdrop.jsx';
 import DestinationPopup from '../components/DestinationPopup.jsx';
+import DestinationsGrid from '../components/DestinationsGrid.jsx';
+import CuratedTrips from '../components/CuratedTrips.jsx';
 import {
     DESTINATIONS, SERVICES, STATS, WHY_CHOOSE, BRAND,
 } from '../data.js';
@@ -230,8 +232,14 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* --- Popular Packages --- */}
-            <section className="py-20 bg-ink-line/30 relative overflow-hidden">
+            {/* --- Top Destinations grid (PickYourTrail-style) --- */}
+            <DestinationsGrid />
+
+            {/* --- Curated trips horizontal carousel --- */}
+            <CuratedTrips eyebrow="Trending Trips" title="Curated journeys, ready to go" />
+
+            {/* --- Hidden legacy packages grid (kept for SEO content) --- */}
+            <section className="py-20 bg-ink-line/30 relative overflow-hidden hidden">
                 <AmbientBackdrop variant="mixed" />
                 <div className="container-x relative">
                     <SectionHeading
@@ -258,8 +266,8 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* --- Top Destinations --- */}
-            <section className="py-20">
+            {/* --- Old top destinations (hidden — replaced by DestinationsGrid above) --- */}
+            <section className="py-20 hidden">
                 <div className="container-x">
                     <SectionHeading
                         eyebrow="Roam the Planet"
