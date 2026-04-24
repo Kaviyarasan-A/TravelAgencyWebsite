@@ -2,6 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { FiPhone, FiMail, FiMapPin, FiClock, FiMessageCircle } from 'react-icons/fi';
 import { FaWhatsapp, FaFacebookF, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
 import ContactForm from '../components/ContactForm.jsx';
+import AuroraBackground from '../components/AuroraBackground.jsx';
 import { BRAND } from '../data.js';
 
 export default function Contact() {
@@ -14,12 +15,21 @@ export default function Contact() {
             </Helmet>
 
             {/* Hero */}
-            <section className="relative py-20 text-white overflow-hidden">
-                <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "linear-gradient(180deg, rgba(11,15,26,0.7), rgba(11,15,26,0.92)), url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=2000&q=80')" }} />
-                <div className="container-x relative text-center max-w-2xl mx-auto">
-                    <span className="eyebrow !text-brand-400">Let's Talk</span>
-                    <h1 className="font-display text-4xl sm:text-5xl font-extrabold">Plan with a <span className="font-script text-accent">human.</span></h1>
-                    <p className="mt-4 text-white/80">Tell us a bit about what you're after and we'll send a custom plan within 24 hours.</p>
+            <section className="relative bg-ink text-white pt-28 pb-20 lg:pt-32 lg:pb-24 overflow-hidden">
+                <AuroraBackground variant="ocean" intensity={0.8} />
+                <div className="absolute inset-0 bg-gradient-to-b from-ink/55 via-ink/45 to-ink/95" />
+                <div className="container-x relative">
+                    <div className="inline-flex items-center gap-3 mb-5">
+                        <span className="w-8 h-px bg-brand-500" />
+                        <span className="text-brand-500 text-[10px] font-bold uppercase tracking-[3px]">Let's Talk</span>
+                    </div>
+                    <h1 className="font-display font-bold text-white leading-[0.95] max-w-3xl"
+                        style={{ fontSize: 'clamp(32px, 5vw, 56px)', letterSpacing: '-0.03em' }}>
+                        Plan with a <span className="text-brand-500">human.</span>
+                    </h1>
+                    <p className="mt-4 text-white/70 max-w-lg text-[15px] leading-relaxed">
+                        Tell us a bit about what you're after — custom plan in 24 hours.
+                    </p>
                 </div>
             </section>
 

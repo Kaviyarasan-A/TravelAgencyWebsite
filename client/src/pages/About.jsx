@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FiCheck, FiTarget, FiAward, FiUsers } from 'react-icons/fi';
 import SectionHeading from '../components/SectionHeading.jsx';
+import AuroraBackground from '../components/AuroraBackground.jsx';
 import { STATS, TESTIMONIALS } from '../data.js';
 
 export default function About() {
@@ -14,14 +15,20 @@ export default function About() {
             </Helmet>
 
             {/* Hero */}
-            <section className="relative py-24 text-white overflow-hidden">
-                <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "linear-gradient(180deg, rgba(11,15,26,0.72), rgba(11,15,26,0.9)), url('https://images.unsplash.com/photo-1527631746610-bca00a040d60?w=2000&q=80')" }} />
-                <div className="container-x relative text-center max-w-3xl mx-auto">
-                    <span className="eyebrow !text-brand-400">Our Story</span>
-                    <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
-                        15 years of helping people <span className="font-script text-accent">go further.</span>
+            <section className="relative bg-ink text-white pt-28 pb-20 lg:pt-32 lg:pb-24 overflow-hidden">
+                <AuroraBackground variant="ocean" intensity={0.7} />
+                <div className="absolute inset-0 bg-gradient-to-b from-ink/55 via-ink/45 to-ink/95" />
+                <div className="container-x relative">
+                    <div className="inline-flex items-center gap-3 mb-5">
+                        <span className="w-8 h-px bg-brand-500" />
+                        <span className="text-brand-500 text-[10px] font-bold uppercase tracking-[3px]">Our Story</span>
+                    </div>
+                    <h1 className="font-display font-bold text-white leading-[0.95] max-w-3xl"
+                        style={{ fontSize: 'clamp(32px, 5vw, 56px)', letterSpacing: '-0.03em' }}>
+                        15 years of helping people<br />
+                        <span className="text-brand-500">go further.</span>
                     </h1>
-                    <p className="mt-5 text-white/85 text-lg">
+                    <p className="mt-5 text-white/70 max-w-2xl text-[15px] leading-relaxed">
                         What started as a small tour desk in Salem is now a dedicated team
                         that plans holidays across India, places students at global universities and helps founders
                         launch companies in 20+ jurisdictions.

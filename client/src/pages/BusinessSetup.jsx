@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { FiSend, FiCheck, FiBriefcase, FiCreditCard, FiShield, FiTrendingUp, FiHome, FiFileText } from 'react-icons/fi';
 import SectionHeading from '../components/SectionHeading.jsx';
+import AuroraBackground from '../components/AuroraBackground.jsx';
 import { BUSINESS_COUNTRIES, BUSINESS_SERVICES } from '../data.js';
 import { api, openWhatsApp } from '../api.js';
 
@@ -40,25 +41,28 @@ export default function BusinessSetup() {
             </Helmet>
 
             {/* Hero */}
-            <section className="relative py-24 text-white overflow-hidden">
-                <div className="absolute inset-0 bg-cover bg-center"
-                     style={{ backgroundImage: "linear-gradient(180deg, rgba(11,15,26,0.70), rgba(11,15,26,0.88)), url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=2000&q=80')" }} />
+            <section className="relative bg-ink text-white pt-28 pb-20 lg:pt-32 lg:pb-24 overflow-hidden">
+                <AuroraBackground variant="sunset" intensity={0.7} />
+                <div className="absolute inset-0 bg-gradient-to-b from-ink/55 via-ink/45 to-ink/95" />
                 <div className="container-x relative grid lg:grid-cols-[1.3fr_1fr] gap-10 items-center">
                     <div>
-                        <span className="eyebrow !text-brand-400">Company Formation · Visas · Banking</span>
-                        <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
-                            Launch your <span className="font-script text-accent">business</span><br />
+                        <div className="inline-flex items-center gap-3 mb-5">
+                            <span className="w-8 h-px bg-brand-500" />
+                            <span className="text-brand-500 text-[10px] font-bold uppercase tracking-[3px]">Company Formation · Visas · Banking</span>
+                        </div>
+                        <h1 className="font-display font-bold text-white leading-[0.95]"
+                            style={{ fontSize: 'clamp(32px, 5vw, 56px)', letterSpacing: '-0.03em' }}>
+                            Launch your <span className="text-brand-500">business</span><br />
                             across borders.
                         </h1>
-                        <p className="mt-5 text-white/85 max-w-xl text-lg">
+                        <p className="mt-5 text-white/70 max-w-xl text-[15px] leading-relaxed">
                             From Dubai mainland to a Delaware LLC — we handle company formation,
-                            trade license, banking, investor visas and ongoing compliance. One manager,
-                            one clear timeline, one price.
+                            trade license, banking, investor visas and ongoing compliance.
                         </p>
-                        <div className="mt-6 flex flex-wrap gap-6 text-sm">
-                            <span className="inline-flex items-center gap-2"><FiCheck className="text-brand-400" /> 8+ jurisdictions covered</span>
-                            <span className="inline-flex items-center gap-2"><FiCheck className="text-brand-400" /> From 14-day setup</span>
-                            <span className="inline-flex items-center gap-2"><FiCheck className="text-brand-400" /> Corporate bank account included</span>
+                        <div className="mt-6 flex flex-wrap gap-5 text-[13px] text-white/75">
+                            <span className="inline-flex items-center gap-1.5"><FiCheck className="text-brand-400" /> 8+ jurisdictions</span>
+                            <span className="inline-flex items-center gap-1.5"><FiCheck className="text-brand-400" /> 14-day setup</span>
+                            <span className="inline-flex items-center gap-1.5"><FiCheck className="text-brand-400" /> Bank account included</span>
                         </div>
                     </div>
 

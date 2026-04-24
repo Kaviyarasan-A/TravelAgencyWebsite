@@ -946,19 +946,23 @@ app.use((err, _req, res, _next) => {
         console.warn('[migration] package backfill skipped:', e.message);
     }
 
-    // Migration — backfill/heal `video` on existing ads from the latest seed (by title).
+    // Migration — heal ads. Strip all video URLs (we're using static images now
+    // because third-party video CDNs have been returning unexpected content),
+    // and swap any Unsplash image URLs with stable Pexels equivalents pulled
+    // from the current seed.
     try {
         const existingAds = await store.list('ads');
         for (const a of existingAds) {
-            const broken = a.video && /cdn\.pixabay\.com/.test(a.video);
-            if (!a.video || broken) {
+            const patch = {};
+            if (a.video) patch.video = ''; // nuke any stored video url
+            if (a.image && /images\.unsplash\.com/.test(a.image)) {
                 const match = SEED_ADS.find((s) => s.title === a.title);
-                if (match?.video) await store.update('ads', a.id, { video: match.video });
-                else if (broken) await store.update('ads', a.id, { video: '' });
+                if (match?.image) patch.image = match.image;
             }
+            if (Object.keys(patch).length) await store.update('ads', a.id, patch);
         }
     } catch (e) {
-        console.warn('[migration] ad backfill skipped:', e.message);
+        console.warn('[migration] ad heal skipped:', e.message);
     }
 
     // Migration — insert any seed blogs (by slug) that aren't in the DB yet.

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { FiSend, FiCheck, FiAward, FiGlobe, FiUsers, FiBookOpen } from 'react-icons/fi';
 import SectionHeading from '../components/SectionHeading.jsx';
+import AuroraBackground from '../components/AuroraBackground.jsx';
 import { STUDY_COUNTRIES, STUDY_STEPS } from '../data.js';
 import { api, openWhatsApp } from '../api.js';
 
@@ -38,25 +39,28 @@ export default function StudyAbroad() {
             </Helmet>
 
             {/* Hero */}
-            <section className="relative py-24 text-white overflow-hidden">
-                <div className="absolute inset-0 bg-cover bg-center"
-                     style={{ backgroundImage: "linear-gradient(180deg, rgba(11,15,26,0.70), rgba(11,15,26,0.85)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=2000&q=80')" }} />
+            <section className="relative bg-ink text-white pt-28 pb-20 lg:pt-32 lg:pb-24 overflow-hidden">
+                <AuroraBackground variant="forest" intensity={0.7} />
+                <div className="absolute inset-0 bg-gradient-to-b from-ink/55 via-ink/45 to-ink/95" />
                 <div className="container-x relative grid lg:grid-cols-[1.3fr_1fr] gap-10 items-center">
                     <div>
-                        <span className="eyebrow !text-brand-400">Overseas Education</span>
-                        <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
-                            Your university. <br />
-                            Your <span className="font-script text-accent">dream country.</span><br />
-                            One team, zero guesswork.
+                        <div className="inline-flex items-center gap-3 mb-5">
+                            <span className="w-8 h-px bg-brand-500" />
+                            <span className="text-brand-500 text-[10px] font-bold uppercase tracking-[3px]">Overseas Education</span>
+                        </div>
+                        <h1 className="font-display font-bold text-white leading-[0.95]"
+                            style={{ fontSize: 'clamp(32px, 5vw, 56px)', letterSpacing: '-0.03em' }}>
+                            Your university.<br />
+                            Your <span className="text-brand-500">dream country.</span>
                         </h1>
-                        <p className="mt-5 text-white/85 max-w-xl text-lg">
+                        <p className="mt-5 text-white/70 max-w-xl text-[15px] leading-relaxed">
                             1000+ partner universities in 10 countries. Free profile evaluation, scholarship guidance,
                             SOP + LOR support, visa prep and pre-departure — all in one place.
                         </p>
-                        <div className="mt-6 flex flex-wrap gap-6 text-sm">
-                            <span className="inline-flex items-center gap-2"><FiCheck className="text-brand-400" /> Free first counselling</span>
-                            <span className="inline-flex items-center gap-2"><FiCheck className="text-brand-400" /> Scholarship up to 100%</span>
-                            <span className="inline-flex items-center gap-2"><FiCheck className="text-brand-400" /> 95% visa success rate</span>
+                        <div className="mt-6 flex flex-wrap gap-5 text-[13px] text-white/75">
+                            <span className="inline-flex items-center gap-1.5"><FiCheck className="text-brand-400" /> Free first counselling</span>
+                            <span className="inline-flex items-center gap-1.5"><FiCheck className="text-brand-400" /> Scholarship up to 100%</span>
+                            <span className="inline-flex items-center gap-1.5"><FiCheck className="text-brand-400" /> 95% visa success rate</span>
                         </div>
                     </div>
 

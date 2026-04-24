@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { FiArrowRight, FiSearch, FiTag } from 'react-icons/fi';
 import { useBlogs } from '../hooks/useBlogs.js';
-import AmbientBackdrop from '../components/AmbientBackdrop.jsx';
+import AuroraBackground from '../components/AuroraBackground.jsx';
 import { BRAND } from '../data.js';
 
 function formatDate(d) {
@@ -43,15 +43,23 @@ export default function Blog() {
                 <meta name="description" content="Travel guides, itineraries and tips on India & international destinations, study abroad and overseas business setup from Trip with uz." />
             </Helmet>
 
-            <section className="relative bg-mesh-dark text-white py-20 overflow-hidden">
-                <div className="absolute inset-0 bg-cover bg-center opacity-25 animate-zoom-slow" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1488085061387-422e29b40080?w=2000&q=80')" }} />
-                <AmbientBackdrop variant="dark" />
+            <section className="relative bg-ink text-white pt-28 pb-20 lg:pt-32 lg:pb-24 overflow-hidden">
+                <AuroraBackground variant="midnight" intensity={0.8} />
+                <div className="absolute inset-0 bg-gradient-to-b from-ink/50 via-ink/40 to-ink/95" />
+
                 <div className="container-x relative">
-                    <span className="eyebrow !text-brand-400">Field Notes</span>
-                    <h1 className="font-display text-4xl sm:text-5xl font-extrabold">
-                        Travel stories, guides & <span className="font-script text-accent">honest tips</span>
+                    <div className="inline-flex items-center gap-3 mb-5">
+                        <span className="w-8 h-px bg-brand-500" />
+                        <span className="text-brand-500 text-[10px] font-bold uppercase tracking-[3px]">Field Notes</span>
+                    </div>
+                    <h1 className="font-display font-bold text-white leading-[0.95] max-w-3xl"
+                        style={{ fontSize: 'clamp(32px, 5vw, 56px)', letterSpacing: '-0.03em' }}>
+                        Travel stories, guides &<br />
+                        <span className="text-brand-500">honest tips.</span>
                     </h1>
-                    <p className="mt-3 opacity-90 max-w-xl">Written by the same team that plans your trip. No sponsored fluff.</p>
+                    <p className="mt-4 text-white/70 max-w-lg text-[15px] leading-relaxed">
+                        Written by the same team that plans your trip. No sponsored fluff.
+                    </p>
                 </div>
             </section>
 
