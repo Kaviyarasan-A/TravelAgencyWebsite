@@ -1,0 +1,94 @@
+# render.yaml — Render Blueprint for the Trip with uz backend.
+#
+# How to use:
+#   1. Render dashboard → New → Blueprint
+#   2. Select this repo, branch `main`, path `render.yaml`
+#   3. Render shows a preview — click Apply
+#   4. AFTER the service is created, go to Environment tab and set the
+#      `sync: false` vars (ADMIN_PASS, SMTP_PASS, UPI_ID) manually. Those
+#      values are NEVER committed to git.
+
+services:
+  - type: web
+    name: tripwithuz-api
+    runtime: node
+    rootDir: server
+    plan: free                      # Free tier sleeps after 15 min idle.
+                                    # Upgrade to 'starter' ($7/mo) for always-on.
+    region: singapore               # Closest to India — lowest latency.
+    branch: main
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    autoDeploy: true                # Auto-redeploy on every push to main.
+
+    # 1 GB persistent disk for server/db/*.json.
+    # Without this, bookings/blogs/ads reset on every deploy.
+    disk:
+      name: db
+      mountPath: /opt/render/project/src/server/db
+      sizeGB: 1
+
+    envVars:
+      # ---- Runtime ----
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+
+      # ---- Public SEO / URLs ----
+      - key: SITE_URL
+        value: https://tripwithuz.com
+
+      # CORS — comma-separated list of allowed frontend origins.
+      # Update with your Netlify URL after the client is deployed.
+      - key: CORS_ORIGIN
+        sync: false
+
+      # ---- Email recipients ----
+      - key: TO_EMAIL
+        value: kaviyarasanaruchamy@gmail.com,tripwithuzofficial@gmail.com
+
+      # ---- WhatsApp ----
+      - key: WHATSAPP_NUMBER
+        value: "919585680636"
+      - key: WHATSAPP_API_TOKEN
+        sync: false                 # Optional — only if using Cloud API
+      - key: WHATSAPP_PHONE_ID
+        sync: false                 # Optional — only if using Cloud API
+
+      # ---- SMTP (Gmail App Password) ----
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "465"
+      - key: SMTP_SECURE
+        value: "true"
+      - key: SMTP_USER
+        value: kaviyarasanaruchamy@gmail.com
+      - key: SMTP_PASS
+        sync: false                 # YOU set this in dashboard (16-char App Password)
+      - key: FROM_NAME
+        value: Trip with uz
+      - key: FROM_EMAIL
+        value: tripwithuzofficial@gmail.com
+
+      # ---- Admin panel ----
+      - key: ADMIN_USER
+        value: admin
+      - key: ADMIN_PASS
+        sync: false                 # YOU set this in dashboard (strong password)
+      - key: ADMIN_SECRET
+        generateValue: true         # Render auto-generates a strong random string
+
+      # ---- UPI payments ----
+      - key: UPI_ID
+        sync: false                 # YOU set this in dashboard (your real VPA)
+      - key: UPI_PAYEE_NAME
+        value: Trip with uz
+
+      # ---- Optional: Google Places (live reviews) ----
+      - key: GOOGLE_PLACES_API_KEY
+        sync: false
+      - key: GOOGLE_PLACE_ID
+        sync: false
