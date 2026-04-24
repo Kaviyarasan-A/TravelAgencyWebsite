@@ -13,8 +13,10 @@ services:
     name: tripwithuz-api
     runtime: node
     rootDir: server
-    plan: free                      # Free tier sleeps after 15 min idle.
-                                    # Upgrade to 'starter' ($7/mo) for always-on.
+    plan: starter                   # $7/mo (~₹580). Required because Render's
+                                    # free tier doesn't support persistent disks
+                                    # (which we need to keep bookings/blogs).
+                                    # Also always-on (no 30s cold start).
     region: singapore               # Closest to India — lowest latency.
     branch: main
     buildCommand: npm install
