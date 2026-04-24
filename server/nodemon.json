@@ -1,0 +1,9 @@
+{
+  "ignore": [
+    "db/*.json",
+    "db/*.tmp",
+    "node_modules"
+  ],
+  "delay": 500,
+  "ext": "js,json"
+}
