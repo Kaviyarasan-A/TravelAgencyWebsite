@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { FiArrowRight, FiMapPin } from 'react-icons/fi';
 import { usePackages } from '../hooks/usePackages.js';
 import DestinationPopup from './DestinationPopup.jsx';
+import TiltCard from './TiltCard.jsx';
 
 /**
  * A featured set of 8 destinations — large tall cards, inspired by
@@ -75,16 +76,18 @@ export default function DestinationsGrid() {
                 {/* Grid — responsive; tall cards on md+, shorter on mobile */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                     {cards.map((d, i) => (
-                        <motion.button
+                        <motion.div
                             key={d.name}
-                            onClick={() => setOpen(d)}
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, amount: 0.15 }}
                             transition={{ duration: 0.5, delay: (i % 4) * 0.08 }}
-                            whileHover={{ y: -4 }}
-                            className="group relative overflow-hidden rounded-2xl md:rounded-3xl aspect-[3/4] text-left focus:outline-none focus:ring-4 focus:ring-brand-500/20 shadow-soft hover:shadow-card transition"
                         >
+                          <TiltCard className="rounded-2xl md:rounded-3xl">
+                            <button
+                                onClick={() => setOpen(d)}
+                                className="group relative overflow-hidden rounded-2xl md:rounded-3xl aspect-[3/4] text-left focus:outline-none focus:ring-4 focus:ring-brand-500/20 shadow-soft hover:shadow-card transition block w-full"
+                            >
                             {/* Image */}
                             <div
                                 className="absolute inset-0 bg-cover bg-center transition-transform duration-[1200ms] group-hover:scale-110"
@@ -129,7 +132,9 @@ export default function DestinationsGrid() {
                                     <FiArrowRight size={16} />
                                 </span>
                             </div>
-                        </motion.button>
+                            </button>
+                          </TiltCard>
+                        </motion.div>
                     ))}
                 </div>
             </div>

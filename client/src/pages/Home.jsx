@@ -194,8 +194,7 @@ export default function Home() {
             </section>
 
             {/* --- Services --- */}
-            <section className="py-20 relative bg-mesh-warm overflow-hidden">
-                <AmbientBackdrop variant="warm" />
+            <section className="py-20 relative bg-white overflow-hidden">
                 <div className="container-x relative">
                     <SectionHeading
                         eyebrow="What We Do"
@@ -358,8 +357,7 @@ export default function Home() {
             <GoogleReviews />
 
             {/* --- Blog --- */}
-            <section className="py-20 bg-ink-line/30 relative overflow-hidden">
-                <AmbientBackdrop variant="cool" />
+            <section className="py-20 bg-slate-50 relative overflow-hidden">
                 <div className="container-x relative">
                     <SectionHeading
                         eyebrow="Travel Stories & Tips"

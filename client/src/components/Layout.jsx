@@ -7,6 +7,7 @@ import WhatsAppButton from './WhatsAppButton.jsx';
 import EnquiryPopup from './EnquiryPopup.jsx';
 import AIChatbot from './AIChatbot.jsx';
 import { SitewideStrip } from './AdBanner.jsx';
+import CursorGlow from './CursorGlow.jsx';
 import { BRAND } from '../data.js';
 
 export default function Layout() {
@@ -29,6 +30,7 @@ export default function Layout() {
                     </div>
                 </div>
             )}
+            <CursorGlow />
             <SitewideStrip />
             <Navbar />
             {/* Navbar is now fixed (80px). On the home route, the hero absorbs that space.
