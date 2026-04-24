@@ -27,7 +27,7 @@ export default function PackageDetail() {
     return (
         <>
             <Helmet>
-                <title>{pkg.title} | {pkg.days}D/{pkg.nights}N {pkg.country} Tour Package | Trip with uz</title>
+                <title>{`${pkg.title} | ${pkg.days}D/${pkg.nights}N ${pkg.country} Tour Package | Trip with uz`}</title>
                 <meta name="description" content={`${pkg.title} — ${pkg.days}D/${pkg.nights}N ${pkg.country} tour package from ₹${(pkg.basePrice || 0).toLocaleString('en-IN')}. ${(pkg.highlights || []).slice(0, 2).join('. ')}. Book with instant quotation & UPI payments.`} />
                 <meta name="keywords" content={`${pkg.title}, ${pkg.country} tour package, ${pkg.city} trip, ${(pkg.tags || []).join(', ')}, tour package India, ${pkg.days} day ${pkg.country}`} />
                 <meta property="og:title" content={`${pkg.title} — ${pkg.days}D/${pkg.nights}N from ₹${(pkg.basePrice || 0).toLocaleString('en-IN')}`} />

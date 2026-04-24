@@ -113,7 +113,7 @@ export default function BlogDetail() {
     return (
         <>
             <Helmet>
-                <title>{blog.seoTitle || blog.title} | {BRAND.name}</title>
+                <title>{`${blog.seoTitle || blog.title} | ${BRAND.name}`}</title>
                 <meta name="description" content={blog.seoDescription || blog.excerpt} />
                 <meta property="og:title" content={blog.seoTitle || blog.title} />
                 <meta property="og:description" content={blog.seoDescription || blog.excerpt} />

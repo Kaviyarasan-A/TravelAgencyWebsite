@@ -101,7 +101,7 @@ export default function Quotation() {
     return (
         <>
             <Helmet>
-                <title>Booking Quotation · {q.packageTitle} | {BRAND.name}</title>
+                <title>{`Booking Quotation · ${q.packageTitle} | ${BRAND.name}`}</title>
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
 
