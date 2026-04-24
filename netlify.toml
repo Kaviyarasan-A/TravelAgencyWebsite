@@ -1,0 +1,55 @@
+# netlify.toml — root-level config so Netlify auto-deploys the client.
+# Backend (Express) is NOT hosted on Netlify; deploy it separately on
+# Render / Railway / a VPS and point VITE_API_URL at its URL.
+
+[build]
+    # Monorepo: Netlify should look at the client/ folder only.
+    base      = "client"
+    publish   = "dist"
+    command   = "npm install && npm run build"
+
+[build.environment]
+    NODE_VERSION = "20"
+
+# SPA routing — React Router handles URLs on the client side, so every
+# non-file request returns index.html. Without this, deep links like
+# /blog/kerala-backwaters-first-time-traveler-guide 404 on refresh.
+[[redirects]]
+    from   = "/*"
+    to     = "/index.html"
+    status = 200
+
+# Optional: proxy API calls so the client can hit `/api/*` on the same
+# domain instead of crossing CORS. Uncomment + replace with your Render URL
+# if you'd rather not configure VITE_API_URL.
+# [[redirects]]
+#     from   = "/api/*"
+#     to     = "https://tripwithuz-api.onrender.com/api/:splat"
+#     status = 200
+#     force  = true
+
+# Security headers — Netlify applies these to every HTTP response.
+[[headers]]
+    for = "/*"
+    [headers.values]
+        X-Content-Type-Options  = "nosniff"
+        X-Frame-Options         = "SAMEORIGIN"
+        Referrer-Policy         = "strict-origin-when-cross-origin"
+        Permissions-Policy      = "geolocation=(), microphone=(), camera=()"
+
+# Cache fingerprinted Vite assets aggressively (Vite adds content hashes).
+[[headers]]
+    for = "/assets/*"
+    [headers.values]
+        Cache-Control = "public, max-age=31536000, immutable"
+
+# Don't cache sitemap/robots so search engines see updates.
+[[headers]]
+    for = "/sitemap.xml"
+    [headers.values]
+        Cache-Control = "public, max-age=3600"
+
+[[headers]]
+    for = "/robots.txt"
+    [headers.values]
+        Cache-Control = "public, max-age=3600"
