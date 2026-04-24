@@ -1,0 +1,59 @@
+# docker-compose.yml
+# One-command deployment for the Trip with uz stack.
+#
+# Usage:
+#   1. cp server/.env.example server/.env && edit values
+#   2. docker compose up -d --build
+#   3. Client on http://localhost, API on http://localhost:5000
+#
+# DB persistence:
+#   The `server_db` named volume stores server/db/*.json.
+#   Your bookings, blogs, packages and ads survive container rebuilds.
+
+services:
+  server:
+    build:
+      context: ./server
+    container_name: tripwithuz-server
+    restart: unless-stopped
+    env_file:
+      - ./server/.env
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+    ports:
+      - "5000:5000"
+    volumes:
+      - server_db:/app/db
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    networks:
+      - tripwithuz
+
+  client:
+    build:
+      context: ./client
+      args:
+        # In this compose setup, the client talks to the server through the
+        # same host — leave blank so the client uses same-origin /api/* which
+        # nginx will proxy (or set to http://server:5000 if you add a proxy).
+        VITE_API_URL: ""
+    container_name: tripwithuz-client
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    networks:
+      - tripwithuz
+
+volumes:
+  server_db:
+
+networks:
+  tripwithuz:
+    driver: bridge
