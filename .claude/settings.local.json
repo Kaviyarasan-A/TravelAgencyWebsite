@@ -6,7 +6,10 @@
       "Bash(echo \"pid=$!\" sleep 5 curl --max-time 5 -s http://localhost:5001/api/health)",
       "Bash(curl --max-time 10 -s -X POST http://localhost:5001/api/quotation -H \"Content-Type: application/json\" -d '{\"packageSlug\":\"goa-beach-bliss\",\"travelers\":2,\"room\":\"deluxe\",\"season\":\"regular\",\"addons\":[\"flights\"],\"name\":\"Test\",\"email\":\"t@e.com\",\"phone\":\"+919585680636\",\"travel_date\":\"2026-06-15\"}')",
       "Read(//tmp/**)",
-      "Bash(npx --yes esbuild --bundle --format=esm --platform=browser --loader:.js=jsx --loader:.jsx=jsx --outfile=/tmp/bundle.js --external:react --external:react-dom --external:react-router-dom --external:react-helmet-async --external:react-hot-toast --external:framer-motion --external:react-icons/fi --external:react-icons/fa src/main.jsx)"
+      "Bash(npx --yes esbuild --bundle --format=esm --platform=browser --loader:.js=jsx --loader:.jsx=jsx --outfile=/tmp/bundle.js --external:react --external:react-dom --external:react-router-dom --external:react-helmet-async --external:react-hot-toast --external:framer-motion --external:react-icons/fi --external:react-icons/fa src/main.jsx)",
+      "Bash(npm install *)",
+      "Bash(node -e \"console.log\\('lottie-react:', require\\('./package.json'\\).dependencies['lottie-react']\\)\")",
+      "Bash(npx vite *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Kaviy\\.claude\\projects\\c--Users-Kaviy-Documents-TravelAgencyWebsite\\memory"

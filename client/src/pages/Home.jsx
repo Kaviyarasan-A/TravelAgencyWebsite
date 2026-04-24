@@ -19,6 +19,11 @@ import AmbientBackdrop from '../components/AmbientBackdrop.jsx';
 import DestinationPopup from '../components/DestinationPopup.jsx';
 import DestinationsGrid from '../components/DestinationsGrid.jsx';
 import CuratedTrips from '../components/CuratedTrips.jsx';
+import TrustBar from '../components/TrustBar.jsx';
+import TripThemes from '../components/TripThemes.jsx';
+import HowItWorks from '../components/HowItWorks.jsx';
+import ExperienceCards from '../components/ExperienceCards.jsx';
+import VideoTestimonials from '../components/VideoTestimonials.jsx';
 import {
     DESTINATIONS, SERVICES, STATS, WHY_CHOOSE, BRAND,
 } from '../data.js';
@@ -131,6 +136,9 @@ export default function Home() {
 
             <Hero />
 
+            {/* --- Social-proof trust bar (NEW, PickYourTrail-style) --- */}
+            <TrustBar />
+
             {/* --- Scrolling destinations marquee --- */}
             <section className="relative bg-white border-b border-ink-line overflow-hidden">
                 {/* subtle backdrop motion */}
@@ -235,8 +243,20 @@ export default function Home() {
             {/* --- Top Destinations grid (PickYourTrail-style) --- */}
             <DestinationsGrid />
 
+            {/* --- Themed trip tabs (NEW) --- */}
+            <TripThemes />
+
             {/* --- Curated trips horizontal carousel --- */}
             <CuratedTrips eyebrow="Trending Trips" title="Curated journeys, ready to go" />
+
+            {/* --- How it works (NEW, with Lottie icons) --- */}
+            <HowItWorks />
+
+            {/* --- Experience cards (NEW) --- */}
+            <ExperienceCards />
+
+            {/* --- Video testimonials (NEW) --- */}
+            <VideoTestimonials />
 
             {/* --- Hidden legacy packages grid (kept for SEO content) --- */}
             <section className="py-20 bg-ink-line/30 relative overflow-hidden hidden">
@@ -299,8 +319,8 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* --- Why Choose Us --- */}
-            <section className="py-20 bg-ink text-white relative overflow-hidden">
+            {/* --- Why Choose Us (legacy, hidden — replaced by VideoTestimonials) --- */}
+            <section className="py-20 bg-ink text-white relative overflow-hidden hidden">
                 <div className="absolute inset-0 opacity-20 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=2000&q=80')" }} />
                 <div className="container-x relative">
                     <div className="text-center mb-14">
