@@ -1,31 +1,127 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
-import {
-    FiFilter, FiSearch, FiMapPin, FiGlobe, FiUser, FiHeart, FiUsers,
-} from 'react-icons/fi';
+import { FiFilter, FiSearch } from 'react-icons/fi';
 import PackageCard from '../components/PackageCard.jsx';
 import BookingModal from '../components/BookingModal.jsx';
 import { AdInline } from '../components/AdBanner.jsx';
-import AuroraBackground from '../components/AuroraBackground.jsx';
+import CinematicBackground from '../components/CinematicBackground.jsx';
 import { usePackages } from '../hooks/usePackages.js';
 
-const TAGS = ['All', 'Beach', 'Heritage', 'Hill Station', 'Nature', 'Culture', 'Adventure', 'Backwaters', 'Luxury', 'Honeymoon'];
+// Premium picture thumbnails for filter pills — verified-stable Pexels CDN URLs
+const px = (id, name, w = 200) =>
+    `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=${w}`;
+
+const TAGS = [
+    { key: 'All',          emoji: '✨', img: px(1287460, 'wanderlust') },
+    { key: 'Beach',        emoji: '🏖️', img: px(1032650, 'beach') },
+    { key: 'Heritage',     emoji: '🏛️', img: px(2376404, 'heritage') },
+    { key: 'Hill Station', emoji: '⛰️', img: px(1271619, 'mountains') },
+    { key: 'Nature',       emoji: '🌿', img: px(414171, 'forest') },
+    { key: 'Culture',      emoji: '🎭', img: px(2387873, 'culture') },
+    { key: 'Adventure',    emoji: '🧗', img: px(1659437, 'adventure') },
+    { key: 'Backwaters',   emoji: '🛶', img: px(3881104, 'backwaters') },
+    { key: 'Luxury',       emoji: '💎', img: px(258154, 'luxury-resort') },
+    { key: 'Honeymoon',    emoji: '💕', img: px(2166559, 'honeymoon') },
+];
 
 const CATEGORIES = [
-    { key: '',              label: 'All',           icon: null },
-    { key: 'Domestic',      label: 'Domestic',      icon: <FiMapPin /> },
-    { key: 'International', label: 'International', icon: <FiGlobe /> },
+    { key: '',              label: 'All',           emoji: '🌐', img: px(2422259, 'globe') },
+    { key: 'Domestic',      label: 'Domestic',      emoji: '🇮🇳', img: px(1603650, 'taj-mahal') },
+    { key: 'International', label: 'International', emoji: '✈️', img: px(723240,  'skyline') },
 ];
+
+const REGION_EMOJI = {
+    'Europe': '🏰',
+    'South-East Asia': '🌴',
+    'Middle East': '🕌',
+    'East Asia': '⛩️',
+    'Oceania': '🐨',
+    'North America': '🗽',
+    'South America': '🌋',
+    'Africa': '🦁',
+    'North India': '🛕',
+    'South India': '🌊',
+    'Himalayas': '🏔️',
+    'Coastal': '🏝️',
+    'Desert': '🐪',
+};
+
+const REGION_IMG = {
+    'Europe': px(11538142, 'europe'),
+    'South-East Asia': px(2166559, 'sea'),
+    'Middle East': px(162031, 'middle-east'),
+    'East Asia': px(2070033, 'east-asia'),
+    'Oceania': px(995765, 'oceania'),
+    'North America': px(2351649, 'na'),
+    'South America': px(2389349, 'sa'),
+    'Africa': px(259411, 'africa'),
+    'North India': px(2403209, 'north-india'),
+    'South India': px(3881104, 'south-india'),
+    'Himalayas': px(1666021, 'himalayas'),
+    'Coastal': px(1032650, 'coastal'),
+    'Desert': px(2649348, 'desert'),
+    'India': px(3581368, 'india'),
+};
 
 // PickYourTrail-style traveller type — filters packages by "who is travelling"
 const TRIP_TYPES = [
-    { key: '',         label: 'Anyone' },
-    { key: 'solo',     label: 'Solo',     icon: <FiUser />,    match: (p) => (p.tags || []).some((t) => /solo|backpacker/i.test(t)) || p.days <= 5 },
-    { key: 'couples',  label: 'Couples',  icon: <FiHeart />,   match: (p) => /honeymoon|romantic/i.test(p.title) || (p.tags || []).some((t) => /honeymoon|romantic/i.test(t)) },
-    { key: 'family',   label: 'Family',   icon: <FiUsers />,   match: (p) => (p.tags || []).some((t) => /family|kids/i.test(t)) || p.days >= 6 },
-    { key: 'friends',  label: 'Friends',  icon: <FiUsers />,   match: (p) => (p.tags || []).some((t) => /beach|adventure|nightlife|friends/i.test(t)) },
+    { key: '',        label: 'Anyone',  emoji: '🧳', img: px(1008155, 'travel-anyone') },
+    { key: 'solo',    label: 'Solo',    emoji: '🚶', img: px(2422280, 'solo-traveller'),  match: (p) => (p.tags || []).some((t) => /solo|backpacker/i.test(t)) || p.days <= 5 },
+    { key: 'couples', label: 'Couples', emoji: '💑', img: px(1024960, 'couple'),          match: (p) => /honeymoon|romantic/i.test(p.title) || (p.tags || []).some((t) => /honeymoon|romantic/i.test(t)) },
+    { key: 'family',  label: 'Family',  emoji: '👨‍👩‍👧', img: px(1648387, 'family'),         match: (p) => (p.tags || []).some((t) => /family|kids/i.test(t)) || p.days >= 6 },
+    { key: 'friends', label: 'Friends', emoji: '👯', img: px(1153369, 'friends'),         match: (p) => (p.tags || []).some((t) => /beach|adventure|nightlife|friends/i.test(t)) },
 ];
+
+// Premium thumbnail used inside a pill. Two sizes (md = 36px, sm = 28px).
+// Always renders something — falls back to gradient circle + emoji if the image errors.
+function PillThumb({ src, emoji, active, size = 'md' }) {
+    const [ok, setOk] = useState(true);
+    const cls = size === 'sm' ? 'w-7 h-7 text-[13px]' : 'w-9 h-9 text-base';
+
+    if (!src || !ok) {
+        return (
+            <span aria-hidden className={`${cls} inline-flex shrink-0 rounded-full items-center justify-center transition-all duration-300
+                ${active
+                    ? 'bg-gradient-to-br from-amber-300 to-brand-500 text-white shadow-[0_4px_12px_rgba(255,122,0,0.45)]'
+                    : 'bg-gradient-to-br from-brand-50 to-amber-50 text-ink group-hover:scale-110'}`}>
+                {emoji}
+            </span>
+        );
+    }
+    return (
+        <span aria-hidden className={`${cls} relative inline-block shrink-0 rounded-full overflow-hidden transition-all duration-300
+            ${active
+                ? 'ring-[2.5px] ring-amber-300 shadow-[0_6px_18px_rgba(255,122,0,0.5)] scale-105'
+                : 'ring-2 ring-ink-line group-hover:ring-brand-400 group-hover:shadow-[0_4px_14px_rgba(255,122,0,0.18)] group-hover:scale-105'}`}>
+            <img
+                src={src} alt="" onError={() => setOk(false)} loading="lazy"
+                className={`w-full h-full object-cover transition-transform duration-700 ${active ? '' : 'group-hover:scale-125'}`}
+            />
+            {/* Subtle inner gloss to make the photo feel premium, not flat */}
+            <span className="absolute inset-0 rounded-full ring-1 ring-white/30 pointer-events-none" />
+        </span>
+    );
+}
+
+// Reusable premium section heading — a small accent line + uppercase eyebrow
+function FilterEyebrow({ children, accent = 'brand' }) {
+    const dot = accent === 'brand' ? 'from-brand-500 to-amber-400' : 'from-ink to-ink-soft';
+    return (
+        <div className="flex items-center gap-3 mb-4">
+            <span className={`block w-7 h-[3px] rounded-full bg-gradient-to-r ${dot}`} />
+            <span className="text-[10.5px] font-display font-bold uppercase tracking-[3.5px] text-ink-soft">
+                {children}
+            </span>
+        </div>
+    );
+}
+
+// Premium pill base — used by every filter button so heights and fonts stay consistent.
+const pillBase =
+    'group inline-flex items-center gap-3 pl-1 pr-5 h-12 rounded-full border font-display text-[14px] font-semibold leading-none transition-all duration-300 select-none';
+const pillBaseSm =
+    'group inline-flex items-center gap-2.5 pl-1 pr-4 h-10 rounded-full border font-display text-[13px] font-semibold leading-none transition-all duration-300 select-none';
 
 export default function Packages() {
     const [params, setParams] = useSearchParams();
@@ -58,7 +154,7 @@ export default function Packages() {
         let list = PACKAGES.filter((p) => {
             if (category && (p.category || 'Domestic') !== category) return false;
             if (region && p.region !== region) return false;
-            if (tag !== 'All' && !(p.tags || []).includes(tag)) return false;
+            if (tag !== 'All' && !(p.tags || []).includes(tag)) return false; // tag stored as label
             if (typeDef?.match && !typeDef.match(p)) return false;
             if (q) {
                 const s = ((p.title || '') + ' ' + (p.country || '') + ' ' + (p.city || '') + ' ' + (p.tags || []).join(' ')).toLowerCase();
@@ -81,10 +177,9 @@ export default function Packages() {
                 <meta name="description" content="Browse curated domestic & international holiday packages — beaches, hill stations, heritage tours, Dubai, Bali, Europe and more. Customisable itineraries." />
             </Helmet>
 
-            {/* Clean page hero with Aurora animated gradient */}
-            <section className="relative bg-ink text-white pt-28 pb-20 lg:pt-32 lg:pb-24 overflow-hidden">
-                <AuroraBackground variant="sunset" intensity={0.8} />
-                <div className="absolute inset-0 bg-gradient-to-b from-ink/55 via-ink/40 to-ink/95" />
+            {/* Cinematic video-feel hero — Ken-Burns travel slideshow with floating particles */}
+            <section className="relative bg-ink text-white pt-32 pb-24 lg:pt-40 lg:pb-32 overflow-hidden">
+                <CinematicBackground overlay="dark" />
 
                 <div className="container-x relative grid lg:grid-cols-[1.3fr_1fr] gap-10 items-end">
                     <div>
@@ -125,95 +220,132 @@ export default function Packages() {
                 </div>
             </section>
 
-            {/* Trip-type pills (Solo / Couples / Family / Friends) */}
-            <section className="pt-10">
-                <div className="container-x">
-                    <div className="text-[10px] uppercase tracking-[3px] text-ink-muted font-bold mb-3">Who's travelling?</div>
-                    <div className="flex flex-wrap gap-2">
-                        {TRIP_TYPES.map((t) => (
-                            <button
-                                key={t.key || 'any'}
-                                onClick={() => setTripType(t.key)}
-                                className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-semibold transition ${
-                                    tripType === t.key
-                                        ? 'bg-ink text-white border-ink'
-                                        : 'bg-white text-ink border-ink-line hover:border-brand-500 hover:text-brand-500'
-                                }`}>
-                                {t.icon && <span className={tripType === t.key ? 'text-brand-400' : 'text-brand-500'}>{t.icon}</span>}
-                                {t.label}
-                            </button>
-                        ))}
-                    </div>
+            {/* Premium filter wizard — soft warm wash backdrop, three editorial sections */}
+            <section className="relative pt-12 pb-2 overflow-hidden">
+                <div aria-hidden className="absolute inset-0 pointer-events-none">
+                    <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] rounded-full bg-gradient-to-br from-brand-100/60 to-transparent blur-3xl" />
+                    <div className="absolute -bottom-32 -right-24 w-[28rem] h-[28rem] rounded-full bg-gradient-to-tr from-amber-100/50 to-transparent blur-3xl" />
                 </div>
-            </section>
 
-            {/* Category pills */}
-            <section className="pt-6">
-                <div className="container-x">
-                    <div className="text-[10px] uppercase tracking-[3px] text-ink-muted font-bold mb-3">Category</div>
-                    <div className="flex flex-wrap gap-2">
-                        {CATEGORIES.map((c) => (
-                            <button
-                                key={c.key || 'all'}
-                                onClick={() => { setCategory(c.key); setRegion(''); }}
-                                className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-semibold transition
-                                    ${category === c.key ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-ink border-ink-line hover:border-brand-500 hover:text-brand-500'}`}>
-                                {c.icon} {c.label}
-                            </button>
-                        ))}
+                <div className="container-x relative space-y-9">
+                    {/* Trip-type pills */}
+                    <div>
+                        <FilterEyebrow accent="ink">Who's travelling</FilterEyebrow>
+                        <div className="flex flex-wrap gap-3">
+                            {TRIP_TYPES.map((t) => {
+                                const active = tripType === t.key;
+                                return (
+                                    <button
+                                        key={t.key || 'any'}
+                                        onClick={() => setTripType(t.key)}
+                                        className={`${pillBase}
+                                            ${active
+                                                ? 'bg-gradient-to-r from-ink to-[#1c2438] text-white border-ink shadow-[0_10px_28px_rgba(11,15,26,0.35)] -translate-y-0.5'
+                                                : 'bg-white text-ink border-ink-line/70 hover:border-brand-400/80 hover:-translate-y-0.5 hover:shadow-[0_10px_26px_rgba(255,122,0,0.14)]'}`}>
+                                        <PillThumb src={t.img} emoji={t.emoji} active={active} />
+                                        <span className="tracking-[-0.01em]">{t.label}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
-                    {regions.length > 0 && category && (
-                        <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                            <button onClick={() => setRegion('')}
-                                className={`px-3 py-1 rounded-full border transition ${!region ? 'bg-ink text-white border-ink' : 'bg-white border-ink-line text-ink-muted hover:border-brand-500'}`}>
-                                All regions
-                            </button>
-                            {regions.map((r) => (
-                                <button key={r} onClick={() => setRegion(r)}
-                                    className={`px-3 py-1 rounded-full border transition ${region === r ? 'bg-ink text-white border-ink' : 'bg-white border-ink-line text-ink-muted hover:border-brand-500'}`}>
-                                    {r}
+
+                    {/* Category pills */}
+                    <div>
+                        <FilterEyebrow>Category</FilterEyebrow>
+                        <div className="flex flex-wrap gap-3">
+                            {CATEGORIES.map((c) => {
+                                const active = category === c.key;
+                                return (
+                                    <button
+                                        key={c.key || 'all'}
+                                        onClick={() => { setCategory(c.key); setRegion(''); }}
+                                        className={`${pillBase}
+                                            ${active
+                                                ? 'bg-gradient-to-r from-brand-500 to-brand-600 text-white border-brand-500 shadow-[0_12px_28px_rgba(255,122,0,0.42)] -translate-y-0.5'
+                                                : 'bg-white text-ink border-ink-line/70 hover:border-brand-400/80 hover:-translate-y-0.5 hover:shadow-[0_10px_26px_rgba(255,122,0,0.14)]'}`}>
+                                        <PillThumb src={c.img} emoji={c.emoji} active={active} />
+                                        <span className="tracking-[-0.01em]">{c.label}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* Region sub-pills (smaller) */}
+                        {regions.length > 0 && category && (
+                            <div className="mt-4 flex flex-wrap gap-2.5">
+                                <button onClick={() => setRegion('')}
+                                    className={`${pillBaseSm}
+                                        ${!region
+                                            ? 'bg-gradient-to-r from-ink to-[#1c2438] text-white border-ink shadow-[0_8px_20px_rgba(11,15,26,0.3)]'
+                                            : 'bg-white text-ink-muted border-ink-line/70 hover:text-ink hover:border-brand-400/80 hover:-translate-y-0.5'}`}>
+                                    <PillThumb emoji="🗺️" active={!region} size="sm" />
+                                    <span className="tracking-[-0.01em]">All regions</span>
                                 </button>
-                            ))}
+                                {regions.map((r) => {
+                                    const active = region === r;
+                                    return (
+                                        <button key={r} onClick={() => setRegion(r)}
+                                            className={`${pillBaseSm}
+                                                ${active
+                                                    ? 'bg-gradient-to-r from-ink to-[#1c2438] text-white border-ink shadow-[0_8px_20px_rgba(11,15,26,0.3)]'
+                                                    : 'bg-white text-ink-muted border-ink-line/70 hover:text-ink hover:border-brand-400/80 hover:-translate-y-0.5'}`}>
+                                            <PillThumb src={REGION_IMG[r]} emoji={REGION_EMOJI[r] || '📍'} active={active} size="sm" />
+                                            <span className="tracking-[-0.01em]">{r}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Theme tag pills */}
+                    <div>
+                        <FilterEyebrow>Theme</FilterEyebrow>
+                        <div className="flex flex-wrap gap-2.5">
+                            {TAGS.map((t) => {
+                                const active = tag === t.key;
+                                return (
+                                    <button
+                                        key={t.key}
+                                        onClick={() => setTag(t.key)}
+                                        className={`${pillBaseSm}
+                                            ${active
+                                                ? 'bg-gradient-to-r from-amber-400 via-brand-500 to-brand-600 text-white border-brand-500 shadow-[0_10px_24px_rgba(255,122,0,0.42)] -translate-y-0.5'
+                                                : 'bg-white text-ink border-ink-line/70 hover:border-brand-400/80 hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(255,122,0,0.12)]'}`}>
+                                        <PillThumb src={t.img} emoji={t.emoji} active={active} size="sm" />
+                                        <span className="tracking-[-0.01em]">{t.key}</span>
+                                    </button>
+                                );
+                            })}
                         </div>
-                    )}
+                    </div>
                 </div>
             </section>
 
-            {/* Filters bar — sticky under navbar */}
-            <section className="py-6 mt-8 bg-white sticky top-20 z-30 border-y border-ink-line">
-                <div className="container-x flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
-                    <div className="flex items-center gap-3 flex-1">
-                        <div className="relative flex-1 max-w-md">
-                            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-muted" />
-                            <input
-                                value={q} onChange={(e) => setQ(e.target.value)}
-                                placeholder="Search destinations, cities, tags…"
-                                className="input pl-11 text-sm"
-                            />
-                        </div>
-                        <div className="hidden md:flex items-center gap-2 text-xs text-ink-muted font-semibold uppercase tracking-wider"><FiFilter /> Sort</div>
-                        <select value={sort} onChange={(e) => setSort(e.target.value)} className="input max-w-[200px] text-sm">
+            {/* Sticky search + sort bar — premium glass card */}
+            <section className="py-5 mt-8 bg-white/85 backdrop-blur-xl sticky top-20 z-30 border-y border-ink-line/70">
+                <div className="container-x flex flex-col md:flex-row gap-3 md:items-center">
+                    <div className="relative flex-1 min-w-0">
+                        <FiSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-brand-500" size={16} />
+                        <input
+                            value={q} onChange={(e) => setQ(e.target.value)}
+                            placeholder="Search destinations, cities, themes…"
+                            className="w-full h-12 pl-12 pr-5 rounded-full border border-ink-line/70 bg-white text-[14px] font-display text-ink placeholder:text-ink-muted/80 transition-all duration-300 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 hover:border-brand-300 shadow-soft"
+                        />
+                    </div>
+                    <div className="relative md:w-[220px] shrink-0">
+                        <FiFilter className="absolute left-5 top-1/2 -translate-y-1/2 text-brand-500 pointer-events-none" size={14} />
+                        <select value={sort} onChange={(e) => setSort(e.target.value)}
+                            className="w-full h-12 pl-11 pr-9 rounded-full border border-ink-line/70 bg-white text-[13.5px] font-display font-semibold text-ink appearance-none cursor-pointer transition-all duration-300 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 hover:border-brand-300 shadow-soft">
                             <option value="popular">Most popular</option>
-                            <option value="price-low">Price: Low → High</option>
-                            <option value="price-high">Price: High → Low</option>
-                            <option value="days-low">Duration: Short → Long</option>
-                            <option value="days-high">Duration: Long → Short</option>
+                            <option value="price-low">Price · Low to High</option>
+                            <option value="price-high">Price · High to Low</option>
+                            <option value="days-low">Duration · Short to Long</option>
+                            <option value="days-high">Duration · Long to Short</option>
                             <option value="rating">Top-rated</option>
                         </select>
-                    </div>
-                    <div className="flex gap-2 flex-wrap">
-                        {TAGS.map((t) => (
-                            <button
-                                key={t}
-                                onClick={() => setTag(t)}
-                                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border transition
-                                    ${tag === t
-                                        ? 'bg-brand-500 text-white border-brand-500'
-                                        : 'border-ink-line text-ink-muted hover:border-brand-500 hover:text-brand-500'}`}
-                            >
-                                {t}
-                            </button>
-                        ))}
+                        <span className="absolute right-5 top-1/2 -translate-y-1/2 text-ink-muted pointer-events-none">▾</span>
                     </div>
                 </div>
             </section>

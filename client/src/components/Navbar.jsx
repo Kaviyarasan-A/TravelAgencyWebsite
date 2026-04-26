@@ -19,12 +19,14 @@ const LINKS = [
 
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
+    const [hidden, setHidden] = useState(false);   // auto-hide when scrolling DOWN, show when UP
     const [menuOpen, setMenuOpen] = useState(false);
     const [megaOpen, setMegaOpen] = useState(false);
     const [mobilePackagesOpen, setMobilePackagesOpen] = useState(false);
     const { pathname } = useLocation();
     const packages = usePackages();
     const closeTimer = useRef(null);
+    const lastY = useRef(0);
 
     // On the home hero, the navbar overlays a dark image — use transparent/light text
     // until the user scrolls past the hero. On every other page, always use the solid light theme.
@@ -43,11 +45,24 @@ export default function Navbar() {
     useEffect(() => { setMenuOpen(false); setMegaOpen(false); }, [pathname]);
     useEffect(() => () => closeTimer.current && clearTimeout(closeTimer.current), []);
     useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 10);
+        const onScroll = () => {
+            const y = window.scrollY;
+            setScrolled(y > 10);
+            // Auto-hide: scrolling DOWN past the navbar hides it; scrolling UP shows it.
+            // Always show near the top of the page or when the mega/mobile menu is open.
+            if (menuOpen || megaOpen || y < 80) {
+                setHidden(false);
+            } else if (y > lastY.current + 4) {
+                setHidden(true);
+            } else if (y < lastY.current - 4) {
+                setHidden(false);
+            }
+            lastY.current = y;
+        };
         window.addEventListener('scroll', onScroll, { passive: true });
         onScroll();
         return () => window.removeEventListener('scroll', onScroll);
-    }, []);
+    }, [menuOpen, megaOpen]);
 
     // Group packages by category → region for mega menu
     const grouped = useMemo(() => {
@@ -63,29 +78,54 @@ export default function Navbar() {
 
     return (
         <>
-            {/* Main nav */}
-            <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-                transparent
+            {/* Main nav — auto-hides on scroll-down, reveals on scroll-up */}
+            <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out
+                ${hidden ? '-translate-y-full' : 'translate-y-0'}
+                ${transparent
                     ? 'bg-transparent'
-                    : 'bg-white/95 backdrop-blur shadow-soft'
-            }`}>
-                <nav className="container-x flex items-center justify-between h-[80px]">
+                    : 'bg-white/95 backdrop-blur-xl shadow-soft border-b border-ink-line/60'}`}>
+                <nav className="container-x flex items-center justify-between h-[80px] lg:h-[96px]">
                     <Link
                         to="/"
-                        className={`flex items-center gap-3 group transition-all ${
+                        className={`flex items-center gap-3 sm:gap-4 group transition-all duration-300 ${
                             transparent
-                                ? 'bg-white/10 hover:bg-white/15 border border-white/15 backdrop-blur-md pl-2 pr-5 py-1.5 rounded-full shadow-lg'
+                                ? 'bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-xl pl-2 pr-5 sm:pr-6 py-1.5 rounded-full shadow-2xl shadow-black/20'
                                 : ''
                         }`}
                         aria-label={BRAND.name}
                     >
-                        <img
-                            src={BRAND.logo}
-                            alt={BRAND.name}
-                            className={`h-10 sm:h-11 w-auto object-contain transition group-hover:scale-105 rounded-full ${transparent ? '' : ''}`}
-                        />
-                        <span className={`hidden sm:inline font-extrabold text-[18px] tracking-tight transition-colors ${transparent ? 'text-white' : 'text-ink'}`}>
-                            {BRAND.name}
+                        {/* Animated glowing logo */}
+                        <span className="relative shrink-0">
+                            {/* Soft outer pulse halo — only when transparent over hero */}
+                            {transparent && (
+                                <span aria-hidden className="absolute inset-0 rounded-full animate-pulse-ring" />
+                            )}
+                            {/* Gradient ring frame */}
+                            <span className={`relative block rounded-full p-[2px] transition-all duration-300
+                                ${transparent
+                                    ? 'bg-gradient-to-tr from-brand-500 via-amber-400 to-brand-500 shadow-[0_0_24px_rgba(255,122,0,0.45)]'
+                                    : 'bg-gradient-to-tr from-brand-500 to-amber-400 group-hover:shadow-brand'}`}>
+                                <span className={`block rounded-full p-[2px] ${transparent ? 'bg-ink/80' : 'bg-white'}`}>
+                                    <img
+                                        src={BRAND.logo}
+                                        alt={BRAND.name}
+                                        className="h-12 sm:h-14 lg:h-16 w-12 sm:w-14 lg:w-16 object-cover rounded-full transition-transform duration-500 group-hover:scale-105 group-hover:rotate-[6deg]"
+                                    />
+                                </span>
+                            </span>
+                        </span>
+
+                        {/* Brand wordmark + tagline */}
+                        <span className="hidden sm:flex flex-col leading-none">
+                            <span className={`font-display font-extrabold text-[22px] lg:text-[26px] tracking-tight transition-colors
+                                ${transparent ? 'text-white' : 'text-ink'}`}
+                                style={{ letterSpacing: '-0.02em' }}>
+                                {BRAND.name}
+                            </span>
+                            <span className={`mt-1 font-script text-[13px] lg:text-[15px] transition-colors
+                                ${transparent ? 'text-amber-300' : 'text-brand-500'}`}>
+                                {BRAND.tagline}
+                            </span>
                         </span>
                     </Link>
 

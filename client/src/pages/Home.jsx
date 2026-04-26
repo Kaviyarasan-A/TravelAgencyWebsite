@@ -24,6 +24,7 @@ import TripThemes from '../components/TripThemes.jsx';
 import HowItWorks from '../components/HowItWorks.jsx';
 import ExperienceCards from '../components/ExperienceCards.jsx';
 import VideoTestimonials from '../components/VideoTestimonials.jsx';
+import EditorialIntro from '../components/EditorialIntro.jsx';
 import {
     DESTINATIONS, SERVICES, STATS, WHY_CHOOSE, BRAND,
 } from '../data.js';
@@ -138,6 +139,9 @@ export default function Home() {
 
             {/* --- Social-proof trust bar (NEW, PickYourTrail-style) --- */}
             <TrustBar />
+
+            {/* --- Premium editorial intro (Wix-template style) --- */}
+            <EditorialIntro />
 
             {/* --- Scrolling destinations marquee --- */}
             <section className="relative bg-white border-b border-ink-line overflow-hidden">
