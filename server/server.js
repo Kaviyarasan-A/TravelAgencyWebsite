@@ -389,6 +389,78 @@ app.get('/api/blogs/:slug', async (req, res) => {
     res.json({ ok: true, blog, related });
 });
 
+/* ---------------- Seasonal content (public + admin) ---------------- */
+
+// India-centric season auto-detection from current IST month.
+// Spring is intentionally excluded from auto-detect; admin can override to it.
+function detectSeason(now = new Date()) {
+    // Convert to IST (UTC+5:30)
+    const ist = new Date(now.getTime() + (5.5 * 60 - now.getTimezoneOffset()) * 60_000);
+    const m = ist.getMonth() + 1; // 1-12
+    if (m >= 3 && m <= 5)  return 'summer';
+    if (m >= 6 && m <= 9)  return 'monsoon';
+    return 'winter'; // Oct - Feb
+}
+
+const VALID_SEASONS = ['summer', 'monsoon', 'winter', 'spring'];
+
+function defaultSeasonsConfig() {
+    return {
+        mode: 'auto',          // 'auto' | 'override'
+        active: 'summer',      // used when mode === 'override'
+        data: {
+            summer:  { label: 'Summer Escapes',  tagline: 'Beat the heat — hill stations, beaches & adventure.', heroImages: [], featuredSlugs: [] },
+            monsoon: { label: 'Monsoon Magic',   tagline: 'Lush green Kerala, cool getaways & rainy reads.',     heroImages: [], featuredSlugs: [] },
+            winter:  { label: 'Winter Journeys', tagline: 'Goa, Rajasthan, snow & festive sparkle.',             heroImages: [], featuredSlugs: [] },
+            spring:  { label: 'Spring Sojourns', tagline: 'Flowers, festivals & soft sunshine.',                 heroImages: [], featuredSlugs: [] },
+        },
+    };
+}
+
+async function readSeasonsConfig() {
+    const stored = await store.getDoc('seasons', null);
+    const fallback = defaultSeasonsConfig();
+    if (!stored) return fallback;
+    // Merge with defaults so newly-added season keys appear without admin re-saving
+    const merged = {
+        mode: stored.mode === 'override' ? 'override' : 'auto',
+        active: VALID_SEASONS.includes(stored.active) ? stored.active : 'summer',
+        data: { ...fallback.data, ...(stored.data || {}) },
+    };
+    return merged;
+}
+
+app.get('/api/seasonal', async (_req, res) => {
+    try {
+        const cfg = await readSeasonsConfig();
+        const detected = detectSeason();
+        const active = cfg.mode === 'override' ? cfg.active : detected;
+        const season = cfg.data[active] || {};
+
+        // Resolve featured packages by slug — only return published ones
+        let featured = [];
+        if (Array.isArray(season.featuredSlugs) && season.featuredSlugs.length) {
+            const all = await store.list('packages');
+            const bySlug = new Map(all.filter((p) => p.published !== false).map((p) => [p.slug, p]));
+            featured = season.featuredSlugs.map((s) => bySlug.get(s)).filter(Boolean);
+        }
+
+        res.json({
+            ok: true,
+            active,
+            detected,
+            mode: cfg.mode,
+            label: season.label || '',
+            tagline: season.tagline || '',
+            heroImages: Array.isArray(season.heroImages) ? season.heroImages.filter(Boolean) : [],
+            featured,
+        });
+    } catch (e) {
+        console.error('[seasonal]', e);
+        res.status(500).json({ ok: false, error: 'server_error' });
+    }
+});
+
 /* ---------------- Quotation + Booking (public) ---------------- */
 app.get('/api/quotation/options', (_req, res) => {
     res.json({ ok: true, options: describeOptions() });
@@ -712,6 +784,62 @@ app.delete('/api/admin/ads/:id', adminOnly, async (req, res) => {
     const ok = await store.remove('ads', req.params.id);
     if (!ok) return res.status(404).json({ ok: false, error: 'not_found' });
     res.json({ ok: true });
+});
+
+/* ---------------- Admin seasons ---------------- */
+app.get('/api/admin/seasons', adminOnly, async (_req, res) => {
+    const cfg = await readSeasonsConfig();
+    res.json({ ok: true, config: { ...cfg, detected: detectSeason() } });
+});
+
+app.post('/api/admin/seasons', adminOnly, async (req, res) => {
+    try {
+        const incoming = req.body || {};
+        const mode = incoming.mode === 'override' ? 'override' : 'auto';
+        const active = VALID_SEASONS.includes(incoming.active) ? incoming.active : 'summer';
+
+        // Sanitize each season block: only known keys, drop empty entries.
+        // Hero images are stored as { url, title, accent, subtitle } objects; legacy
+        // string entries are auto-upgraded so older saved configs keep working.
+        const sanitizeImages = (raw) => {
+            if (!Array.isArray(raw)) return [];
+            const out = [];
+            for (const entry of raw) {
+                if (typeof entry === 'string') {
+                    const url = entry.trim();
+                    if (url) out.push({ url, title: '', accent: '', subtitle: '' });
+                } else if (entry && typeof entry === 'object') {
+                    const url = String(entry.url || '').trim();
+                    if (!url) continue;
+                    out.push({
+                        url,
+                        title: String(entry.title || '').slice(0, 80),
+                        accent: String(entry.accent || '').slice(0, 80),
+                        subtitle: String(entry.subtitle || '').slice(0, 200),
+                    });
+                }
+                if (out.length >= 12) break;
+            }
+            return out;
+        };
+
+        const data = {};
+        for (const key of VALID_SEASONS) {
+            const src = (incoming.data && incoming.data[key]) || {};
+            data[key] = {
+                label: typeof src.label === 'string' ? src.label.slice(0, 80) : '',
+                tagline: typeof src.tagline === 'string' ? src.tagline.slice(0, 200) : '',
+                heroImages: sanitizeImages(src.heroImages),
+                featuredSlugs: Array.isArray(src.featuredSlugs) ? src.featuredSlugs.filter((s) => typeof s === 'string').slice(0, 12) : [],
+            };
+        }
+
+        const saved = await store.setDoc('seasons', { mode, active, data });
+        res.json({ ok: true, config: { ...saved, detected: detectSeason() } });
+    } catch (e) {
+        console.error('[admin/seasons]', e);
+        res.status(500).json({ ok: false, error: 'server_error' });
+    }
 });
 
 /* ---------------- Admin blogs ---------------- */

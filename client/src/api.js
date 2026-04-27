@@ -133,6 +133,13 @@ export const api = {
     adminUpdateBooking:  (id, p)      => patchAuth(`/api/admin/bookings/${id}`, p),
     adminDeleteBooking:  (id)         => delAuth(`/api/admin/bookings/${id}`),
 
+    // public — seasonal content (active season + matching hero slides + featured packages)
+    seasonal:            ()           => get('/api/seasonal'),
+
+    // admin — seasons
+    adminSeasons:        ()           => getAuth('/api/admin/seasons'),
+    adminUpdateSeasons:  (data)       => postAuth('/api/admin/seasons', data),
+
     // returns the full URL (with auth header) for the caller to trigger a browser download
     adminEnquiriesCsvUrl: () => `${BASE}/api/admin/enquiries.csv`,
     adminBackupUrl:       () => `${BASE}/api/admin/backup`,

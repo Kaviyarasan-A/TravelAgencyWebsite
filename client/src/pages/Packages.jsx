@@ -1,12 +1,20 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useSearchParams } from 'react-router-dom';
-import { FiFilter, FiSearch } from 'react-icons/fi';
+import { Link, useSearchParams } from 'react-router-dom';
+import { FiFilter, FiSearch, FiX, FiSun, FiCloudRain, FiCloudSnow, FiCloud } from 'react-icons/fi';
 import PackageCard from '../components/PackageCard.jsx';
 import BookingModal from '../components/BookingModal.jsx';
 import { AdInline } from '../components/AdBanner.jsx';
 import CinematicBackground from '../components/CinematicBackground.jsx';
 import { usePackages } from '../hooks/usePackages.js';
+import { useSeasonal } from '../hooks/useSeasonal.js';
+
+const SEASON_ICON = {
+    summer:  <FiSun />,
+    monsoon: <FiCloudRain />,
+    winter:  <FiCloudSnow />,
+    spring:  <FiCloud />,
+};
 
 // Premium picture thumbnails for filter pills — verified-stable Pexels CDN URLs
 const px = (id, name, w = 200) =>
@@ -129,29 +137,41 @@ export default function Packages() {
     const [category, setCategory] = useState(params.get('category') || '');
     const [region, setRegion] = useState(params.get('region') || '');
     const [tripType, setTripType] = useState(params.get('type') || '');
+    const [season, setSeason] = useState(params.get('season') || '');
     const [q, setQ] = useState('');
     const [sort, setSort] = useState('popular');
     const [bookOpen, setBookOpen] = useState(false);
     const [bookPkg, setBookPkg] = useState(null);
     const PACKAGES = usePackages();
+    const seasonal = useSeasonal();
 
     useEffect(() => {
         if (category) params.set('category', category); else params.delete('category');
         if (region)   params.set('region', region);     else params.delete('region');
         if (tag && tag !== 'All') params.set('tag', tag); else params.delete('tag');
         if (tripType) params.set('type', tripType); else params.delete('type');
+        if (season)   params.set('season', season);     else params.delete('season');
         setParams(params, { replace: true });
         // eslint-disable-next-line
-    }, [category, region, tag, tripType]);
+    }, [category, region, tag, tripType, season]);
 
     const regions = useMemo(() => {
         const pool = category ? PACKAGES.filter((p) => (p.category || 'Domestic') === category) : PACKAGES;
         return Array.from(new Set(pool.map((p) => p.region).filter(Boolean)));
     }, [PACKAGES, category]);
 
+    // Set of slugs the active season featured — used as a hard filter when ?season= is set
+    const seasonSlugs = useMemo(() => {
+        if (!season || !seasonal) return null;
+        if (seasonal.active !== season) return null; // user requested a season that isn't currently live
+        const slugs = (seasonal.featured || []).map((p) => p.slug);
+        return new Set(slugs);
+    }, [season, seasonal]);
+
     const filtered = useMemo(() => {
         const typeDef = TRIP_TYPES.find((t) => t.key === tripType);
         let list = PACKAGES.filter((p) => {
+            if (seasonSlugs && !seasonSlugs.has(p.slug)) return false;
             if (category && (p.category || 'Domestic') !== category) return false;
             if (region && p.region !== region) return false;
             if (tag !== 'All' && !(p.tags || []).includes(tag)) return false; // tag stored as label
@@ -168,7 +188,7 @@ export default function Packages() {
         if (sort === 'price-low')  list = [...list].sort((a, b) => (a.basePrice || 0) - (b.basePrice || 0));
         if (sort === 'price-high') list = [...list].sort((a, b) => (b.basePrice || 0) - (a.basePrice || 0));
         return list;
-    }, [tag, q, sort, category, region, tripType, PACKAGES]);
+    }, [tag, q, sort, category, region, tripType, PACKAGES, seasonSlugs]);
 
     return (
         <>
@@ -212,6 +232,32 @@ export default function Packages() {
                     </div>
                 </div>
             </section>
+
+            {/* Season-filter banner — only shows when arriving via "Explore trips" from a live season */}
+            {season && seasonSlugs && (
+                <section className="pt-8">
+                    <div className="container-x">
+                        <div className="rounded-2xl border border-brand-200 bg-gradient-to-r from-brand-50 via-amber-50 to-white p-4 lg:p-5 flex flex-wrap items-center gap-4">
+                            <span className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-brand-500 to-amber-400 text-white text-lg shadow-[0_8px_18px_rgba(255,122,0,0.35)]">
+                                {SEASON_ICON[season] || <FiSun />}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                                <div className="text-[10.5px] font-display font-bold uppercase tracking-[2.5px] text-brand-600">
+                                    {seasonal?.label || `${season[0].toUpperCase() + season.slice(1)} season`}
+                                </div>
+                                <div className="font-display font-bold text-ink text-[16px] truncate" style={{ letterSpacing: '-0.01em' }}>
+                                    Showing {seasonSlugs.size} {season} pick{seasonSlugs.size === 1 ? '' : 's'}
+                                    {seasonal?.tagline && <span className="text-ink-muted font-normal text-[13.5px] ml-2">— {seasonal.tagline}</span>}
+                                </div>
+                            </div>
+                            <button onClick={() => setSeason('')}
+                                className="inline-flex items-center gap-1.5 h-10 px-4 rounded-full border border-brand-300 text-brand-700 hover:bg-brand-100 hover:border-brand-400 font-display font-semibold text-[12.5px] transition shrink-0">
+                                <FiX size={14} /> Show all packages
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            )}
 
             {/* Promo banner */}
             <section className="pt-10">

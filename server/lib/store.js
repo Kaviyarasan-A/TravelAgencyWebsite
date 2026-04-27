@@ -109,3 +109,24 @@ export async function seedIfEmpty(name, rows) {
         return seeded;
     });
 }
+
+/* -----------------------------------------------------------------
+ * Single-document helpers — same on-disk format as collections, but
+ * the file holds one object instead of an array. Used for app-wide
+ * config (seasonal content, feature flags, etc).
+ * ----------------------------------------------------------------- */
+export async function getDoc(name, fallback = {}) {
+    return withLock(name, async () => {
+        const data = await readRaw(name, null);
+        if (data && !Array.isArray(data) && typeof data === 'object') return data;
+        return fallback;
+    });
+}
+
+export async function setDoc(name, data) {
+    return withLock(name, async () => {
+        const next = { ...data, updatedAt: new Date().toISOString() };
+        await writeRaw(name, next);
+        return next;
+    });
+}

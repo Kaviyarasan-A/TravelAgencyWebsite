@@ -11,6 +11,7 @@ import {
     FiCopy, FiEye, FiEyeOff, FiShield, FiDatabase, FiChevronRight,
     FiChevronUp, FiChevronDown, FiArrowUp, FiArrowDown, FiZap,
     FiImage, FiFileText, FiCreditCard, FiDollarSign, FiTag, FiSmartphone,
+    FiSun, FiCloud, FiCloudRain, FiCloudSnow, FiHome,
 } from 'react-icons/fi';
 import { api, setAdminToken, getAdminToken, downloadWithAuth } from '../api.js';
 import { BRAND } from '../data.js';
@@ -145,90 +146,194 @@ function LoginForm({ onAuthed }) {
  * Shell with sidebar
  * ========================================================================= */
 
-const NAV = [
-    { id: 'dashboard', label: 'Dashboard',  icon: <FiBarChart2 /> },
-    { id: 'enquiries', label: 'Enquiries',  icon: <FiInbox /> },
-    { id: 'bookings',  label: 'Bookings',   icon: <FiCreditCard /> },
-    { id: 'packages',  label: 'Packages',   icon: <FiPackage /> },
-    { id: 'ads',       label: 'Ads / Promo',icon: <FiImage /> },
-    { id: 'blogs',     label: 'Blog Posts', icon: <FiFileText /> },
-    { id: 'settings',  label: 'Settings',   icon: <FiSettings /> },
+// Nav grouped into sections — labels only render when sidebar is expanded
+const NAV_GROUPS = [
+    {
+        section: 'Overview',
+        items: [
+            { id: 'dashboard', label: 'Dashboard',  icon: <FiBarChart2 />, hint: 'Stats & activity' },
+        ],
+    },
+    {
+        section: 'Operations',
+        items: [
+            { id: 'enquiries', label: 'Enquiries',  icon: <FiInbox />,      hint: 'Leads · contact form' },
+            { id: 'bookings',  label: 'Bookings',   icon: <FiCreditCard />, hint: 'Quotations & UPI payments' },
+        ],
+    },
+    {
+        section: 'Content',
+        items: [
+            { id: 'packages',  label: 'Packages',   icon: <FiPackage />,  hint: 'Tour packages' },
+            { id: 'seasons',   label: 'Seasons',    icon: <FiSun />,      hint: 'Seasonal home content' },
+            { id: 'ads',       label: 'Ads / Promo',icon: <FiImage />,    hint: 'Hero & inline banners' },
+            { id: 'blogs',     label: 'Blog Posts', icon: <FiFileText />, hint: 'SEO articles' },
+        ],
+    },
+    {
+        section: 'System',
+        items: [
+            { id: 'settings',  label: 'Settings',   icon: <FiSettings />, hint: 'Profile & security' },
+        ],
+    },
 ];
+
+// Flat lookup helper used by header / breadcrumb
+const NAV = NAV_GROUPS.flatMap((g) => g.items);
 
 function AdminShell({ user, onLogout }) {
     const [tab, setTab] = useState('dashboard');
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [expanded, setExpanded] = useState(false); // desktop hover-expand
 
     useEffect(() => { setMobileOpen(false); }, [tab]);
 
+    const current = NAV.find((n) => n.id === tab);
+    const currentGroup = NAV_GROUPS.find((g) => g.items.some((i) => i.id === tab));
+    const showText = expanded || mobileOpen;
+
     return (
-        <div className="min-h-screen flex bg-slate-100">
-            {/* Sidebar */}
-            <aside className={`
-                fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-slate-200
-                transform transition-transform duration-200
-                ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-            `}>
-                <div className="h-16 flex items-center gap-3 px-5 border-b border-slate-200">
-                    <img src={BRAND.logo} alt={BRAND.name} className="h-9 w-auto" />
-                    <div className="leading-tight">
-                        <div className="font-extrabold text-ink text-sm">{BRAND.name}</div>
-                        <div className="text-[11px] uppercase tracking-widest text-brand-500 font-semibold">Admin</div>
+        <div className="min-h-screen bg-slate-100">
+            {/* Premium dark sidebar — fixed to viewport so it never scrolls with the page.
+                Icon-only at 76px by default; on hover it expands to 260px and overlays the
+                content (z-index above main), so we don't need to widen the page margin. */}
+            <aside
+                onMouseEnter={() => setExpanded(true)}
+                onMouseLeave={() => setExpanded(false)}
+                className={`
+                    fixed top-0 left-0 bottom-0 z-40
+                    bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-white
+                    border-r border-white/5
+                    flex flex-col
+                    transition-all duration-300 ease-out
+                    ${showText ? 'w-[260px]' : 'w-[76px]'}
+                    ${mobileOpen ? 'translate-x-0 w-[260px]' : '-translate-x-full lg:translate-x-0'}
+                `}
+            >
+                {/* Brand block */}
+                <div className="h-[72px] flex items-center gap-3 px-4 border-b border-white/5 shrink-0">
+                    <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-brand-500 to-amber-400 p-[2px] shadow-[0_0_24px_rgba(255,122,0,0.35)] shrink-0">
+                        <div className="w-full h-full rounded-[10px] bg-slate-950 p-1.5 flex items-center justify-center">
+                            <img src={BRAND.logo} alt={BRAND.name} className="w-full h-full object-cover rounded-md" />
+                        </div>
+                    </div>
+                    <div className={`leading-tight whitespace-nowrap overflow-hidden transition-opacity duration-200 ${showText ? 'opacity-100' : 'opacity-0'}`}>
+                        <div className="font-display font-extrabold text-[15px] tracking-tight">{BRAND.name}</div>
+                        <div className="text-[10px] uppercase tracking-[2.5px] text-brand-400 font-bold mt-0.5">Admin Console</div>
                     </div>
                 </div>
 
-                <nav className="p-3 space-y-1">
-                    {NAV.map((n) => (
-                        <button
-                            key={n.id} onClick={() => setTab(n.id)}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
-                                tab === n.id
-                                    ? 'bg-brand-grad text-white shadow-brand'
-                                    : 'text-ink-muted hover:bg-slate-100 hover:text-ink'
-                            }`}>
-                            {n.icon}
-                            <span>{n.label}</span>
-                            {tab === n.id && <FiChevronRight className="ml-auto" />}
-                        </button>
+                {/* Nav */}
+                <nav className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-2.5 space-y-5 no-scrollbar">
+                    {NAV_GROUPS.map((g) => (
+                        <div key={g.section}>
+                            <div className={`px-3 mb-2 text-[10px] font-bold uppercase tracking-[2.5px] text-slate-500 transition-opacity duration-200 ${showText ? 'opacity-100' : 'opacity-0 h-0 m-0'}`}>
+                                {g.section}
+                            </div>
+                            <div className="space-y-1">
+                                {g.items.map((n) => {
+                                    const active = tab === n.id;
+                                    return (
+                                        <button
+                                            key={n.id}
+                                            onClick={() => setTab(n.id)}
+                                            title={!showText ? n.label : undefined}
+                                            className={`group relative w-full flex items-center gap-3 px-3 h-11 rounded-xl text-[13.5px] font-display font-semibold transition-all duration-200
+                                                ${active
+                                                    ? 'bg-gradient-to-r from-brand-500/90 to-brand-600 text-white shadow-[0_8px_22px_rgba(255,122,0,0.32)]'
+                                                    : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}
+                                        >
+                                            {/* Left accent rail when active */}
+                                            {active && <span aria-hidden className="absolute -left-2.5 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-amber-300 shadow-[0_0_12px_rgba(252,211,77,0.7)]" />}
+                                            <span className="text-[18px] shrink-0">{n.icon}</span>
+                                            <span className={`truncate whitespace-nowrap transition-opacity duration-200 ${showText ? 'opacity-100' : 'opacity-0'}`}>
+                                                {n.label}
+                                            </span>
+                                            {active && showText && <FiChevronRight className="ml-auto opacity-90" />}
+
+                                            {/* Floating tooltip when collapsed */}
+                                            {!showText && (
+                                                <span className="pointer-events-none absolute left-full ml-3 z-50 whitespace-nowrap rounded-lg bg-slate-800 text-white text-xs font-semibold px-3 py-1.5 shadow-xl ring-1 ring-white/10
+                                                    opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition">
+                                                    {n.label}
+                                                </span>
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
                     ))}
                 </nav>
 
-                <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-slate-200">
-                    <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-slate-50">
-                        <div className="w-9 h-9 rounded-full bg-brand-grad text-white font-bold flex items-center justify-center">
+                {/* User profile at bottom */}
+                <div className="border-t border-white/5 p-2.5 shrink-0">
+                    <div className="flex items-center gap-3 px-2 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.07] transition">
+                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-amber-400 text-white font-display font-extrabold flex items-center justify-center text-sm shadow-[0_4px_12px_rgba(255,122,0,0.45)] shrink-0">
                             {(user?.username || 'A').slice(0, 1).toUpperCase()}
                         </div>
-                        <div className="flex-1 min-w-0">
-                            <div className="text-sm font-semibold text-ink truncate">{user?.username || 'admin'}</div>
-                            <div className="text-[11px] text-ink-muted">Signed in</div>
+                        <div className={`flex-1 min-w-0 transition-opacity duration-200 ${showText ? 'opacity-100' : 'opacity-0'}`}>
+                            <div className="text-[13px] font-display font-semibold text-white truncate">{user?.username || 'admin'}</div>
+                            <div className="text-[10.5px] text-slate-400 uppercase tracking-wider">● Online</div>
                         </div>
-                        <button onClick={onLogout} title="Sign out"
-                            className="w-8 h-8 rounded-lg hover:bg-red-50 text-red-500 flex items-center justify-center">
-                            <FiLogOut />
+                        <button onClick={onLogout}
+                            title="Sign out"
+                            className={`w-9 h-9 rounded-lg hover:bg-red-500/15 text-red-400 hover:text-red-300 flex items-center justify-center transition shrink-0 ${showText ? '' : 'hidden'}`}>
+                            <FiLogOut size={16} />
                         </button>
                     </div>
                 </div>
             </aside>
 
-            {mobileOpen && <div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={() => setMobileOpen(false)} />}
+            {mobileOpen && <div className="fixed inset-0 bg-black/50 z-30 lg:hidden" onClick={() => setMobileOpen(false)} />}
 
-            {/* Main */}
-            <div className="flex-1 min-w-0 flex flex-col">
-                <header className="h-16 bg-white border-b border-slate-200 flex items-center px-4 sm:px-6 gap-3 sticky top-0 z-20">
+            {/* Main — left padding equals collapsed sidebar width on desktop so content
+                never sits under the icon rail. Hover-expanded sidebar overlays this area. */}
+            <div className="flex flex-col min-h-screen lg:pl-[76px]">
+                {/* Top bar with breadcrumb */}
+                <header className="h-[72px] bg-white/95 backdrop-blur-xl border-b border-slate-200/80 flex items-center px-4 sm:px-7 gap-4 sticky top-0 z-20">
                     <button onClick={() => setMobileOpen(true)} className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-slate-100">
                         <FiMenu size={20} />
                     </button>
-                    <h1 className="font-display text-lg sm:text-xl font-bold text-ink capitalize">
-                        {NAV.find((n) => n.id === tab)?.label}
-                    </h1>
+
+                    {/* Breadcrumb */}
+                    <nav aria-label="Breadcrumb" className="flex items-center gap-2 min-w-0">
+                        <Link to="/" className="text-slate-400 hover:text-brand-500 transition shrink-0">
+                            <FiHome size={14} />
+                        </Link>
+                        <FiChevronRight className="text-slate-300 shrink-0" size={13} />
+                        <span className="text-[12px] font-display font-semibold uppercase tracking-[1.5px] text-slate-500 shrink-0">Admin</span>
+                        {currentGroup && (
+                            <>
+                                <FiChevronRight className="text-slate-300 shrink-0" size={13} />
+                                <span className="text-[12px] font-display font-semibold text-slate-400 shrink-0 hidden sm:inline">{currentGroup.section}</span>
+                            </>
+                        )}
+                        <FiChevronRight className="text-slate-300 shrink-0 hidden sm:inline" size={13} />
+                        <h1 className="font-display text-[17px] sm:text-[19px] font-extrabold text-ink truncate" style={{ letterSpacing: '-0.02em' }}>
+                            {current?.label}
+                        </h1>
+                    </nav>
+
                     <div className="ml-auto flex items-center gap-2">
-                        <Link to="/" className="hidden sm:inline-flex items-center gap-1.5 text-xs text-ink-muted hover:text-brand-500 px-3 py-2 rounded-lg hover:bg-slate-100">
-                            <FiExternalLink /> View site
+                        <Link to="/" className="hidden md:inline-flex items-center gap-2 text-[12.5px] font-display font-semibold text-slate-600 hover:text-brand-500 px-3.5 h-10 rounded-xl border border-slate-200 hover:border-brand-300 hover:bg-brand-50/40 transition">
+                            <FiExternalLink size={14} /> View live site
                         </Link>
                     </div>
                 </header>
 
-                <main className="flex-1 p-4 sm:p-6 overflow-x-hidden">
+                {/* Page header — eyebrow + hint */}
+                {current?.hint && (
+                    <div className="bg-white border-b border-slate-200/80 px-4 sm:px-7 py-3">
+                        <div className="text-[12px] text-slate-500">
+                            <span className="font-display font-semibold text-slate-700">{current.label}</span>
+                            <span className="mx-2 text-slate-300">·</span>
+                            <span>{current.hint}</span>
+                        </div>
+                    </div>
+                )}
+
+                <main className="flex-1 p-4 sm:p-7 overflow-x-hidden">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={tab}
@@ -239,6 +344,7 @@ function AdminShell({ user, onLogout }) {
                             {tab === 'enquiries' && <EnquiriesPanel />}
                             {tab === 'bookings'  && <BookingsPanel />}
                             {tab === 'packages'  && <PackagesPanel />}
+                            {tab === 'seasons'   && <SeasonsPanel />}
                             {tab === 'ads'       && <AdsPanel />}
                             {tab === 'blogs'     && <BlogsPanel />}
                             {tab === 'settings'  && <SettingsPanel user={user} />}
@@ -1797,6 +1903,316 @@ function BlogEditor({ initial, onClose, onSave }) {
                 </motion.div>
             </motion.div>
         </AnimatePresence>
+    );
+}
+
+/* =========================================================================
+ * Seasons — admin can set active season + per-season hero images & featured packages
+ * ========================================================================= */
+
+const SEASON_LIST = [
+    { key: 'summer',  label: 'Summer',  icon: <FiSun />,        hint: 'Mar – May (hill stations, beaches)', accent: 'from-amber-400 to-brand-500' },
+    { key: 'monsoon', label: 'Monsoon', icon: <FiCloudRain />,  hint: 'Jun – Sep (Kerala, lush greens)',     accent: 'from-emerald-400 to-teal-600' },
+    { key: 'winter',  label: 'Winter',  icon: <FiCloudSnow />,  hint: 'Oct – Feb (Goa, Rajasthan, snow)',    accent: 'from-sky-400 to-indigo-600' },
+    { key: 'spring',  label: 'Spring',  icon: <FiCloud />,      hint: 'Transition months — flowers, festivals', accent: 'from-pink-400 to-rose-500' },
+];
+
+function SeasonsPanel() {
+    const [config, setConfig] = useState(null);
+    const [packages, setPackages] = useState([]);
+    const [activeTab, setActiveTab] = useState('summer');
+    const [saving, setSaving] = useState(false);
+    const [err, setErr] = useState(null);
+
+    const load = async () => {
+        setErr(null);
+        const [s, p] = await Promise.all([api.adminSeasons(), api.adminPackages()]);
+        if (s.ok) setConfig(s.data.config); else setErr(s.error);
+        if (p.ok) setPackages(p.data.packages || []);
+    };
+
+    useEffect(() => { load(); /* eslint-disable-next-line */ }, []);
+
+    if (err)    return <ErrorBlock msg={err} onRetry={load} />;
+    if (!config) return <Loading />;
+
+    const detected = config.detected;
+    const effective = config.mode === 'override' ? config.active : detected;
+
+    const setMode = (mode) => setConfig({ ...config, mode });
+    const setActive = (season) => setConfig({ ...config, active: season });
+    const setSeasonField = (season, field, value) => {
+        const next = { ...config };
+        next.data = { ...(next.data || {}) };
+        next.data[season] = { ...(next.data[season] || {}), [field]: value };
+        setConfig(next);
+    };
+
+    const save = async () => {
+        setSaving(true);
+        const r = await api.adminUpdateSeasons(config);
+        setSaving(false);
+        if (!r.ok) { toast.error('Could not save seasons'); return; }
+        toast.success('Seasonal content saved');
+        if (r.data?.config) setConfig(r.data.config);
+    };
+
+    return (
+        <div className="space-y-6">
+            {/* Status banner */}
+            <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-brand-900/60 rounded-3xl p-6 lg:p-8 text-white relative overflow-hidden">
+                <div aria-hidden className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-brand-500/30 blur-3xl" />
+                <div className="relative">
+                    <div className="text-[10.5px] font-display font-bold uppercase tracking-[3px] text-brand-300 mb-2">
+                        Currently Live
+                    </div>
+                    <div className="flex flex-wrap items-end gap-4">
+                        <h2 className="font-display text-3xl lg:text-4xl font-extrabold capitalize" style={{ letterSpacing: '-0.025em' }}>
+                            {effective} season
+                        </h2>
+                        <span className="text-[12px] text-white/60 mb-1.5">
+                            {config.mode === 'override'
+                                ? <><span className="text-amber-300 font-semibold">Manual override</span> · auto-detected: <span className="text-white capitalize">{detected}</span></>
+                                : <>Auto-detected from current month (IST)</>}
+                        </span>
+                    </div>
+                    <p className="text-white/70 text-[14px] mt-3 max-w-xl">
+                        The home hero, packages page and promo banners pull from the season above. Pick a season tab below to edit its hero images, tagline and featured trips.
+                    </p>
+
+                    {/* Mode toggle */}
+                    <div className="mt-6 inline-flex items-center gap-1 rounded-full bg-white/10 p-1 border border-white/15 backdrop-blur">
+                        <button onClick={() => setMode('auto')}
+                            className={`px-4 h-9 rounded-full text-[12.5px] font-display font-semibold transition ${config.mode === 'auto' ? 'bg-white text-ink shadow' : 'text-white/80 hover:text-white'}`}>
+                            Auto-detect
+                        </button>
+                        <button onClick={() => setMode('override')}
+                            className={`px-4 h-9 rounded-full text-[12.5px] font-display font-semibold transition ${config.mode === 'override' ? 'bg-white text-ink shadow' : 'text-white/80 hover:text-white'}`}>
+                            Manual override
+                        </button>
+                    </div>
+
+                    {config.mode === 'override' && (
+                        <div className="mt-4 flex flex-wrap gap-2">
+                            {SEASON_LIST.map((s) => (
+                                <button key={s.key} onClick={() => setActive(s.key)}
+                                    className={`inline-flex items-center gap-2 h-10 pl-3 pr-4 rounded-full text-[13px] font-display font-semibold transition border
+                                        ${config.active === s.key
+                                            ? `bg-gradient-to-r ${s.accent} text-white border-transparent shadow-lg`
+                                            : 'bg-white/5 text-white/85 border-white/15 hover:bg-white/10'}`}>
+                                    <span className="text-base">{s.icon}</span>
+                                    {s.label}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Season tabs */}
+            <div className="bg-white rounded-3xl border border-slate-200/80 overflow-hidden">
+                <div className="border-b border-slate-200/80 flex flex-wrap">
+                    {SEASON_LIST.map((s) => {
+                        const active = activeTab === s.key;
+                        const isLive = effective === s.key;
+                        return (
+                            <button key={s.key} onClick={() => setActiveTab(s.key)}
+                                className={`relative flex items-center gap-2 px-5 lg:px-6 h-14 text-[13.5px] font-display font-semibold transition
+                                    ${active ? 'text-ink bg-slate-50' : 'text-slate-500 hover:text-ink hover:bg-slate-50/60'}`}>
+                                <span className={`text-base ${active ? 'text-brand-500' : ''}`}>{s.icon}</span>
+                                {s.label}
+                                {isLive && <span className="ml-1 inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" title="Currently live" />}
+                                {active && <span className="absolute left-0 right-0 bottom-0 h-[3px] bg-gradient-to-r from-brand-500 to-amber-400" />}
+                            </button>
+                        );
+                    })}
+                </div>
+
+                <SeasonEditor
+                    season={activeTab}
+                    data={(config.data || {})[activeTab] || {}}
+                    onChange={(field, value) => setSeasonField(activeTab, field, value)}
+                    packages={packages}
+                />
+            </div>
+
+            {/* Save bar */}
+            <div className="sticky bottom-4 z-10">
+                <div className="bg-ink text-white rounded-2xl shadow-2xl px-5 py-3.5 flex items-center justify-between gap-4">
+                    <div className="text-[13px]">
+                        <span className="font-display font-semibold text-amber-300">Unsaved changes</span>
+                        <span className="text-white/60 ml-2 hidden sm:inline">— click save to push the seasonal content live.</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button onClick={load} className="h-10 px-4 rounded-xl text-[13px] font-display font-semibold text-white/80 hover:text-white hover:bg-white/10 transition inline-flex items-center gap-1.5">
+                            <FiRefreshCw size={14} /> Reset
+                        </button>
+                        <button onClick={save} disabled={saving}
+                            className="h-10 px-5 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-display font-semibold text-[13px] inline-flex items-center gap-2 shadow-[0_8px_22px_rgba(255,122,0,0.4)] transition disabled:opacity-70">
+                            <FiSave size={14} /> {saving ? 'Saving…' : 'Save changes'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function SeasonEditor({ season, data, onChange, packages }) {
+    const meta = SEASON_LIST.find((s) => s.key === season);
+    // Normalize legacy string entries to objects so the editor always works on { url, title, accent, subtitle }
+    const heroImages = (Array.isArray(data.heroImages) ? data.heroImages : []).map((e) =>
+        typeof e === 'string' ? { url: e, title: '', accent: '', subtitle: '' } : { url: '', title: '', accent: '', subtitle: '', ...e }
+    );
+    const featuredSlugs = Array.isArray(data.featuredSlugs) ? data.featuredSlugs : [];
+
+    const addImage = () => onChange('heroImages', [...heroImages, { url: '', title: '', accent: '', subtitle: '' }]);
+    const updateImage = (i, field, value) => {
+        const next = heroImages.map((e, idx) => (idx === i ? { ...e, [field]: value } : e));
+        onChange('heroImages', next);
+    };
+    const removeImage = (i) => onChange('heroImages', heroImages.filter((_, idx) => idx !== i));
+
+    const togglePackage = (slug) => {
+        if (featuredSlugs.includes(slug)) onChange('featuredSlugs', featuredSlugs.filter((s) => s !== slug));
+        else onChange('featuredSlugs', [...featuredSlugs, slug]);
+    };
+
+    return (
+        <div className="p-6 lg:p-8 space-y-7">
+            {/* Heading */}
+            <div>
+                <div className={`inline-flex items-center gap-2 px-3 h-7 rounded-full bg-gradient-to-r ${meta.accent} text-white text-[10.5px] font-display font-bold uppercase tracking-[2px]`}>
+                    {meta.icon} {meta.label}
+                </div>
+                <p className="text-[12.5px] text-slate-500 mt-2">{meta.hint}</p>
+            </div>
+
+            {/* Label + tagline */}
+            <div className="grid md:grid-cols-2 gap-5">
+                <div>
+                    <label className="label">Section label</label>
+                    <input className="input" placeholder={`e.g. ${meta.label} Escapes`}
+                        value={data.label || ''} onChange={(e) => onChange('label', e.target.value)} />
+                    <p className="text-[11px] text-slate-500 mt-1.5">Shown as the eyebrow above the hero ("{meta.label} Escapes")</p>
+                </div>
+                <div>
+                    <label className="label">Tagline</label>
+                    <input className="input" placeholder="Short pitch shown under the headline"
+                        value={data.tagline || ''} onChange={(e) => onChange('tagline', e.target.value)} />
+                    <p className="text-[11px] text-slate-500 mt-1.5">e.g. Beat the heat — hill stations, beaches &amp; adventure</p>
+                </div>
+            </div>
+
+            {/* Hero images */}
+            <div>
+                <div className="flex items-center justify-between mb-3">
+                    <div>
+                        <label className="label !mb-0">Hero images</label>
+                        <p className="text-[11px] text-slate-500 mt-1">Cinematic background photos for the home hero. Crossfade in order.</p>
+                    </div>
+                    <button onClick={addImage}
+                        className="h-9 px-3.5 rounded-lg bg-brand-50 text-brand-600 hover:bg-brand-100 inline-flex items-center gap-1.5 text-[12.5px] font-display font-semibold transition">
+                        <FiPlus size={14} /> Add image
+                    </button>
+                </div>
+                <div className="space-y-3">
+                    {heroImages.length === 0 && (
+                        <div className="text-[12.5px] text-slate-500 italic px-3 py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                            No images yet. The home hero will fall back to its default photos when this season is live.
+                        </div>
+                    )}
+                    {heroImages.map((img, i) => (
+                        <div key={i} className="bg-slate-50 rounded-2xl p-3 border border-slate-200/80">
+                            <div className="flex items-start gap-3">
+                                <div className="w-24 h-20 rounded-xl overflow-hidden bg-slate-200 shrink-0 ring-1 ring-slate-200">
+                                    {img.url
+                                        ? <img src={img.url} alt="" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.opacity = 0.2; }} />
+                                        : <div className="w-full h-full flex items-center justify-center text-slate-400"><FiImage size={16} /></div>}
+                                </div>
+                                <div className="flex-1 min-w-0 space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-slate-200 text-slate-600 font-display font-bold text-[11px] shrink-0">
+                                            {String(i + 1).padStart(2, '0')}
+                                        </span>
+                                        <input
+                                            value={img.url}
+                                            onChange={(e) => updateImage(i, 'url', e.target.value)}
+                                            placeholder="Image URL — https://images.pexels.com/..."
+                                            className="flex-1 bg-white border border-slate-200 rounded-lg px-3 h-9 text-[12.5px] focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15"
+                                        />
+                                        <button onClick={() => removeImage(i)}
+                                            className="w-9 h-9 rounded-lg text-red-500 hover:bg-red-50 flex items-center justify-center shrink-0" title="Remove">
+                                            <FiTrash2 size={14} />
+                                        </button>
+                                    </div>
+                                    <div className="grid sm:grid-cols-2 gap-2">
+                                        <input
+                                            value={img.title}
+                                            onChange={(e) => updateImage(i, 'title', e.target.value)}
+                                            placeholder="Title (white) e.g. Snow-dusted"
+                                            className="bg-white border border-slate-200 rounded-lg px-3 h-9 text-[12.5px] focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15"
+                                        />
+                                        <input
+                                            value={img.accent}
+                                            onChange={(e) => updateImage(i, 'accent', e.target.value)}
+                                            placeholder="Accent (orange) e.g. horizons."
+                                            className="bg-white border border-slate-200 rounded-lg px-3 h-9 text-[12.5px] focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15"
+                                        />
+                                    </div>
+                                    <input
+                                        value={img.subtitle}
+                                        onChange={(e) => updateImage(i, 'subtitle', e.target.value)}
+                                        placeholder="Subtitle (optional) — e.g. Manali, Gulmarg, Auli — fresh powder, warm cabins"
+                                        className="w-full bg-white border border-slate-200 rounded-lg px-3 h-9 text-[12.5px] focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15"
+                                    />
+                                    <p className="text-[10.5px] text-slate-500 leading-snug">
+                                        Leave any field blank to fall back to a curated {meta.label.toLowerCase()} default.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Featured packages */}
+            <div>
+                <div className="flex items-center justify-between mb-3">
+                    <div>
+                        <label className="label !mb-0">Featured packages</label>
+                        <p className="text-[11px] text-slate-500 mt-1">Surfaced first on the home page when this season is live. {featuredSlugs.length} selected.</p>
+                    </div>
+                </div>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-[420px] overflow-y-auto pr-1">
+                    {packages.length === 0 && (
+                        <div className="col-span-full text-[12.5px] text-slate-500 italic px-3 py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                            No packages yet. Add packages first, then come back here to feature them.
+                        </div>
+                    )}
+                    {packages.map((p) => {
+                        const checked = featuredSlugs.includes(p.slug);
+                        return (
+                            <label key={p.slug || p.id}
+                                className={`group relative flex items-center gap-3 p-2.5 rounded-xl border cursor-pointer transition
+                                    ${checked ? 'border-brand-400 bg-brand-50/60 shadow-[0_4px_14px_rgba(255,122,0,0.12)]' : 'border-slate-200 hover:border-brand-300 bg-white'}`}>
+                                <input type="checkbox" checked={checked} onChange={() => togglePackage(p.slug)} className="sr-only" />
+                                <div className="w-12 h-12 rounded-lg bg-cover bg-center bg-slate-200 shrink-0"
+                                    style={p.image ? { backgroundImage: `url(${p.image})` } : undefined} />
+                                <div className="min-w-0 flex-1">
+                                    <div className="text-[13px] font-display font-semibold text-ink truncate" style={{ letterSpacing: '-0.01em' }}>{p.title}</div>
+                                    <div className="text-[11px] text-slate-500 truncate">{p.city || ''}{p.country ? ` · ${p.country}` : ''}{p.days ? ` · ${p.days}D` : ''}</div>
+                                </div>
+                                <span className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition
+                                    ${checked ? 'bg-brand-500 border-brand-500 text-white' : 'border-slate-300 group-hover:border-brand-400'}`}>
+                                    {checked && <FiCheckCircle size={12} />}
+                                </span>
+                            </label>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
     );
 }
 

@@ -25,6 +25,7 @@ import HowItWorks from '../components/HowItWorks.jsx';
 import ExperienceCards from '../components/ExperienceCards.jsx';
 import VideoTestimonials from '../components/VideoTestimonials.jsx';
 import EditorialIntro from '../components/EditorialIntro.jsx';
+import SeasonalSpotlight from '../components/SeasonalSpotlight.jsx';
 import {
     DESTINATIONS, SERVICES, STATS, WHY_CHOOSE, BRAND,
 } from '../data.js';
@@ -142,6 +143,9 @@ export default function Home() {
 
             {/* --- Premium editorial intro (Wix-template style) --- */}
             <EditorialIntro />
+
+            {/* --- Seasonal Spotlight — admin-managed featured packages for the active season --- */}
+            <SeasonalSpotlight onBook={openBooking} />
 
             {/* --- Scrolling destinations marquee --- */}
             <section className="relative bg-white border-b border-ink-line overflow-hidden">
