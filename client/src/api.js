@@ -136,6 +136,11 @@ export const api = {
     // public — seasonal content (active season + matching hero slides + featured packages)
     seasonal:            ()           => get('/api/seasonal'),
 
+    // public — destinations (separate catalogue, enquiry-only — no booking flow)
+    listDestinations:    (kind = '')  => get(`/api/destinations${kind ? `?kind=${encodeURIComponent(kind)}` : ''}`),
+    getDestination:      (slug)       => get(`/api/destinations/${encodeURIComponent(slug)}`),
+    destinationEnquire:  (payload)    => post('/api/destinations/enquire', payload),
+
     // admin — seasons
     adminSeasons:        ()           => getAuth('/api/admin/seasons'),
     adminUpdateSeasons:  (data)       => postAuth('/api/admin/seasons', data),

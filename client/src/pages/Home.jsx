@@ -26,6 +26,8 @@ import ExperienceCards from '../components/ExperienceCards.jsx';
 import VideoTestimonials from '../components/VideoTestimonials.jsx';
 import EditorialIntro from '../components/EditorialIntro.jsx';
 import SeasonalSpotlight from '../components/SeasonalSpotlight.jsx';
+import TopDestinations from '../components/TopDestinations.jsx';
+import PopularHolidays from '../components/PopularHolidays.jsx';
 import {
     DESTINATIONS, SERVICES, STATS, WHY_CHOOSE, BRAND,
 } from '../data.js';
@@ -246,6 +248,12 @@ export default function Home() {
                     </div>
                 </div>
             </section>
+
+            {/* --- Top Destinations (legsgo-style enquiry-only catalogue) --- */}
+            <TopDestinations />
+
+            {/* --- Popular Holidays (curated India-focused, enquiry-only) --- */}
+            <PopularHolidays />
 
             {/* --- Top Destinations grid (PickYourTrail-style) --- */}
             <DestinationsGrid />

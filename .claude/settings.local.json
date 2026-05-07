@@ -9,7 +9,8 @@
       "Bash(npx --yes esbuild --bundle --format=esm --platform=browser --loader:.js=jsx --loader:.jsx=jsx --outfile=/tmp/bundle.js --external:react --external:react-dom --external:react-router-dom --external:react-helmet-async --external:react-hot-toast --external:framer-motion --external:react-icons/fi --external:react-icons/fa src/main.jsx)",
       "Bash(npm install *)",
       "Bash(node -e \"console.log\\('lottie-react:', require\\('./package.json'\\).dependencies['lottie-react']\\)\")",
-      "Bash(npx vite *)"
+      "Bash(npx vite *)",
+      "WebFetch(domain:www.legsgo.com)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Kaviy\\.claude\\projects\\c--Users-Kaviy-Documents-TravelAgencyWebsite\\memory"

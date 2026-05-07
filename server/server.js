@@ -37,6 +37,7 @@ import { buildMessage, waLink, sendViaCloudApi } from './lib/whatsapp.js';
 import { SEED_PACKAGES } from './lib/seedPackages.js';
 import { SEED_BLOGS } from './lib/seedBlogs.js';
 import { SEED_ADS } from './lib/seedAds.js';
+import { SEED_DESTINATIONS } from './lib/seedDestinations.js';
 import { buildQuotation, describeOptions } from './lib/quotation.js';
 import { buildUpiLink, upiConfig } from './lib/upi.js';
 
@@ -457,6 +458,77 @@ app.get('/api/seasonal', async (_req, res) => {
         });
     } catch (e) {
         console.error('[seasonal]', e);
+        res.status(500).json({ ok: false, error: 'server_error' });
+    }
+});
+
+/* ---------------- Destinations (public, enquiry-only) ----------------
+ * Standalone catalogue separate from `packages`. Browse + view detail +
+ * submit a lightweight enquiry. No quotation engine, no UPI, no booking.
+ * --------------------------------------------------------------------- */
+app.get('/api/destinations', async (req, res) => {
+    const all = await store.list('destinations');
+    let list = all.filter((d) => d.published !== false);
+    if (req.query.kind === 'top' || req.query.kind === 'popular') {
+        list = list.filter((d) => d.kind === req.query.kind);
+    }
+    // Strip the heavy `gallery` + `intro` arrays from the list response
+    res.json({ ok: true, destinations: list.map(({ gallery, intro, ...rest }) => rest) });
+});
+
+app.get('/api/destinations/:slug', async (req, res) => {
+    const all = await store.list('destinations');
+    const d = all.find((x) => x.slug === req.params.slug && x.published !== false);
+    if (!d) return res.status(404).json({ ok: false, error: 'not_found' });
+    const related = all
+        .filter((x) => x.published !== false && x.slug !== d.slug && x.kind === d.kind)
+        .slice(0, 3)
+        .map(({ gallery, intro, ...rest }) => rest);
+    res.json({ ok: true, destination: d, related });
+});
+
+app.post('/api/destinations/enquire', formLimiter, async (req, res) => {
+    try {
+        const { destinationSlug, name, email, phone, travel_date, travelers, message, website } = req.body || {};
+        if (website) return res.json({ ok: true }); // honeypot
+        if (!name || !email || !phone) {
+            return res.status(400).json({ ok: false, error: 'Missing contact details' });
+        }
+        if (!isEmail(email)) return res.status(400).json({ ok: false, error: 'Invalid email' });
+
+        const all = await store.list('destinations');
+        const dest = all.find((d) => d.slug === destinationSlug);
+
+        const fields = {
+            'Destination': dest ? `${dest.title} (${dest.location || dest.country})` : (destinationSlug || '—'),
+            'Name': name,
+            'Email': email,
+            'Phone': phone,
+            'Travel date': travel_date || 'Not specified',
+            'Travelers': travelers || 'Not specified',
+            'Message': message || '—',
+        };
+
+        const record = await store.insert('enquiries', {
+            type: 'Destination Enquiry',
+            status: 'new',
+            fields,
+        });
+
+        await sendMail({
+            subject: `[Destination] ${dest ? dest.title : 'Enquiry'} — ${name}`,
+            title: dest ? `Destination enquiry · ${dest.title}` : 'Destination enquiry',
+            intro: `${name} (${phone}) wants more details on ${dest ? dest.title : 'a destination'}.`,
+            fields,
+            replyTo: email,
+        }).catch((e) => console.error('[destinations/enquire] mail failed:', e.message));
+
+        const wa = `https://wa.me/${(process.env.WHATSAPP_NUMBER || '919585680636').replace(/\D/g, '')}` +
+            `?text=${encodeURIComponent(`Hi! I'm interested in ${dest ? dest.title : 'a destination'} for ${travelers || '2 adults'} around ${travel_date || 'soon'}. — ${name}`)}`;
+
+        res.json({ ok: true, id: record.id, whatsappUrl: wa });
+    } catch (e) {
+        console.error('[destinations/enquire]', e);
         res.status(500).json({ ok: false, error: 'server_error' });
     }
 });
@@ -1031,6 +1103,23 @@ app.use((err, _req, res, _next) => {
     await store.seedIfEmpty('ads', SEED_ADS);
     await store.seedIfEmpty('blogs', SEED_BLOGS);
     await store.seedIfEmpty('bookings', []);
+    await store.seedIfEmpty('destinations', SEED_DESTINATIONS);
+
+    // Migration — backfill `places` array on existing destination rows from
+    // the seed, so older saves get the new tourist-spots data without a wipe.
+    // Doesn't touch any other field, so admin-edited values are preserved.
+    try {
+        const existingDest = await store.list('destinations');
+        for (const d of existingDest) {
+            const seedMatch = SEED_DESTINATIONS.find((s) => s.slug === d.slug);
+            if (!seedMatch) continue;
+            const patch = {};
+            if (!Array.isArray(d.places) || d.places.length === 0) patch.places = seedMatch.places || [];
+            if (Object.keys(patch).length > 0) await store.update('destinations', d.id, patch);
+        }
+    } catch (e) {
+        console.warn('[migration] destinations places backfill failed:', e.message);
+    }
 
     // Migration — backfill new fields on existing package rows and add any
     // international packages that didn't exist in the pre-v4 seed.

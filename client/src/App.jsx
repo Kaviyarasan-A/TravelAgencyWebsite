@@ -17,6 +17,7 @@ const Admin         = lazy(() => import('./pages/Admin.jsx'));
 const Blog          = lazy(() => import('./pages/Blog.jsx'));
 const BlogDetail    = lazy(() => import('./pages/BlogDetail.jsx'));
 const Quotation     = lazy(() => import('./pages/Quotation.jsx'));
+const DestinationDetail = lazy(() => import('./pages/DestinationDetail.jsx'));
 
 function PageFallback() {
     return (
@@ -39,6 +40,7 @@ export default function App() {
                 <Route path="/blog" element={<Suspense fallback={<PageFallback />}><Blog /></Suspense>} />
                 <Route path="/blog/:slug" element={<Suspense fallback={<PageFallback />}><BlogDetail /></Suspense>} />
                 <Route path="/quotation/:id" element={<Suspense fallback={<PageFallback />}><Quotation /></Suspense>} />
+                <Route path="/destinations/:slug" element={<Suspense fallback={<PageFallback />}><DestinationDetail /></Suspense>} />
                 <Route path="/about" element={<Suspense fallback={<PageFallback />}><About /></Suspense>} />
                 <Route path="/contact" element={<Suspense fallback={<PageFallback />}><Contact /></Suspense>} />
                 <Route path="/careers" element={<Suspense fallback={<PageFallback />}><Careers /></Suspense>} />
