@@ -43,6 +43,7 @@ export default function PackageDetail() {
                     description: `${pkg.days}-day ${pkg.country} tour package covering ${pkg.city}. ${(pkg.highlights || []).slice(0, 3).join('. ')}`,
                     image: pkg.image,
                     touristType: pkg.tags || [],
+                    provider: { '@id': 'https://tripwithuz.com/#organization' },
                     itinerary: (pkg.itinerary || []).map((d) => ({
                         '@type': 'TouristAttraction',
                         name: d.t,
@@ -53,6 +54,15 @@ export default function PackageDetail() {
                         ratingValue: pkg.rating,
                         reviewCount: pkg.reviews || 10,
                     } : undefined,
+                })}</script>
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'BreadcrumbList',
+                    itemListElement: [
+                        { '@type': 'ListItem', position: 1, name: 'Home',          item: 'https://tripwithuz.com/' },
+                        { '@type': 'ListItem', position: 2, name: 'Tour Packages', item: 'https://tripwithuz.com/packages' },
+                        { '@type': 'ListItem', position: 3, name: pkg.title,        item: `https://tripwithuz.com/packages/${pkg.slug}` },
+                    ],
                 })}</script>
             </Helmet>
 

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { FiStar, FiExternalLink } from 'react-icons/fi';
 import { FaGoogle } from 'react-icons/fa';
 import SectionHeading from './SectionHeading.jsx';
-import { TESTIMONIALS } from '../data.js';
+import { TESTIMONIALS, BRAND } from '../data.js';
 import { api } from '../api.js';
 
 function StarRating({ rating }) {
@@ -138,19 +138,25 @@ export default function GoogleReviews() {
                     }
                 </div>
 
-                {/* Write a review CTA */}
-                {hasGoogle && googleData.googleUrl && (
-                    <div className="text-center mt-10">
-                        <a
-                            href={googleData.googleUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="btn-primary"
-                        >
-                            <FaGoogle /> Write a Review on Google
-                        </a>
-                    </div>
-                )}
+                {/* Write a review CTA — always shown using the GBP review link from BRAND */}
+                <div className="text-center mt-10 flex flex-wrap justify-center gap-3">
+                    <a
+                        href={BRAND.gbp.reviewUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-primary"
+                    >
+                        <FaGoogle /> Write a Review on Google
+                    </a>
+                    <a
+                        href={(hasGoogle && googleData.googleUrl) || BRAND.gbp.shareUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-outline"
+                    >
+                        <FiExternalLink /> View us on Google
+                    </a>
+                </div>
             </div>
         </section>
     );

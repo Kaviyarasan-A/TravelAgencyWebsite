@@ -197,6 +197,11 @@ export default function Packages() {
                 <meta property="og:title" content="Tour Packages in India & Tamil Nadu | Trip with uz Salem" />
                 <meta property="og:description" content="Tamil Nadu holidays, India tours and international packages. Customisable itineraries and instant quotation from Salem's most trusted travel agency." />
                 <meta property="og:type" content="website" />
+                <meta property="og:image" content="https://tripwithuz.com/logo.png" />
+                <meta property="og:url" content="https://tripwithuz.com/packages" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Tour Packages in India & Tamil Nadu | Trip with uz" />
+                <meta name="twitter:description" content="Browse 50+ curated tour packages — Kerala, Ooty, Goa, Dubai, Bali, Europe." />
                 <link rel="canonical" href="https://tripwithuz.com/packages" />
                 <script type="application/ld+json">{JSON.stringify({
                     '@context': 'https://schema.org',

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FaFacebookF, FaInstagram, FaTwitter, FaYoutube, FaLinkedinIn } from 'react-icons/fa';
+import { FaFacebookF, FaInstagram, FaYoutube, FaGoogle, FaWhatsapp } from 'react-icons/fa';
 import { FiPhone, FiMail, FiMapPin, FiClock } from 'react-icons/fi';
 import { BRAND } from '../data.js';
 
@@ -18,13 +18,13 @@ export default function Footer() {
                     </p>
                     <div className="flex gap-3 mt-5">
                         {[
-                            { icon: <FaFacebookF />,  url: BRAND.social.facebook, label: 'Facebook' },
                             { icon: <FaInstagram />, url: BRAND.social.instagram, label: 'Instagram' },
-                            { icon: <FaTwitter />,   url: BRAND.social.twitter,  label: 'Twitter' },
-                            { icon: <FaYoutube />,   url: BRAND.social.youtube,  label: 'YouTube' },
-                            { icon: <FaLinkedinIn />,url: BRAND.social.linkedin, label: 'LinkedIn' },
+                            { icon: <FaFacebookF />, url: BRAND.social.facebook,  label: 'Facebook' },
+                            { icon: <FaYoutube />,   url: BRAND.social.youtube,   label: 'YouTube' },
+                            { icon: <FaGoogle />,    url: BRAND.gbp.shareUrl,     label: 'Google Business Profile' },
+                            { icon: <FaWhatsapp />,  url: `https://wa.me/${BRAND.whatsapp}`, label: 'WhatsApp' },
                         ].map((s) => (
-                            <a key={s.label} href={s.url} aria-label={s.label}
+                            <a key={s.label} href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.label}
                                 className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-brand-500 hover:text-white hover:scale-110 hover:-translate-y-1 transition-all duration-300">
                                 {s.icon}
                             </a>

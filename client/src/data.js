@@ -5,6 +5,8 @@
 export const BRAND = {
     name: 'Trip with uz',
     logo: '/logo.png',
+    ogImage: '/logo.png', // TODO: replace with /og-image.jpg (1200x630) — see PUBLIC_FOLDER_TODO.md
+    siteUrl: 'https://tripwithuz.com',
     tagline: 'Your Trips · Your Vibes',
     phone: '+91 90870 06777',
     phone2: '+91 98430 12831',
@@ -12,12 +14,29 @@ export const BRAND = {
     email: 'tripwithuzofficial@gmail.com',
     address: 'No. 2/113, Narasothipatti, Opposite Amman Bakery, Salem – 636004, Tamil Nadu, India',
     hours: 'Mon–Sat · 9:00 AM – 8:00 PM IST',
+    geo: { latitude: 11.683555, longitude: 78.135265 }, // actual GBP coordinates
+    // Google Business Profile — share / review / direct Maps URLs
+    gbp: {
+        shareUrl:  'https://share.google/UfYZ9ExJmRx4r1Kk6',
+        reviewUrl: 'https://g.page/r/Cf5lmIQe-KpfEBM/review',
+        cid:       '6893957108253123070',
+        cidUrl:    'https://maps.google.com/?cid=6893957108253123070',
+        // CID-based embed works without an API key
+        embedUrl:  'https://maps.google.com/maps?q=Trip+With+Uz+Salem+Narasothipatti&t=&z=16&ie=UTF8&iwloc=&output=embed',
+        // Driving directions — Google Maps will pick the best route from user's location
+        directionsUrl: 'https://www.google.com/maps/dir/?api=1&destination=Trip+With+Uz+Salem&destination_place_id=ChIJMzC5w_DwuzsR_mWYhB74ql8',
+    },
+    // TODO: paste real handles from user; placeholders kept so links never 404 within the same domain
     social: {
-        facebook:  'https://facebook.com/',
-        instagram: 'https://instagram.com/',
-        twitter:   'https://twitter.com/',
-        youtube:   'https://youtube.com/',
-        linkedin:  'https://linkedin.com/',
+        facebook:  'https://www.facebook.com/tripwithuz',   // TODO: confirm real handle
+        instagram: 'https://www.instagram.com/trip_with_uz',
+        youtube:   'https://www.youtube.com/@tripwithuz',   // TODO: confirm real handle
+    },
+    // Tracking + verification — paste real values when ready
+    tracking: {
+        ga4MeasurementId:    'G-XXXXXXXXXX',       // TODO: paste GA4 Measurement ID
+        searchConsoleVerify: 'TODO_GSC_CONTENT',   // TODO: paste Search Console HTML-tag content
+        bingVerify:          'TODO_BING_CONTENT',  // TODO: paste Bing Webmaster meta content
     },
 };
 

@@ -89,11 +89,47 @@ export default function DestinationDetail() {
     return (
         <>
             <Helmet>
-                <title>{`${d.title} | ${BRAND.name}`}</title>
-                <meta name="description" content={`${d.title} (${d.country}) — ${d.days}D/${d.nights}N. ${(d.highlights || []).slice(0, 2).join('. ')}`} />
-                <meta property="og:title" content={`${d.title} — ${d.country}`} />
+                <title>{`${d.title} Tour Package — ${d.days}D/${d.nights}N from Salem | ${BRAND.name}`}</title>
+                <meta name="description" content={`${d.title} (${d.country}) — ${d.days}D/${d.nights}N tour package from Salem, Tamil Nadu. ${(d.highlights || []).slice(0, 2).join('. ')}. Plan with Trip with uz — instant quotation.`} />
+                <meta name="keywords" content={`${d.title} tour package, ${d.title} from Salem, ${d.title} from Tamil Nadu, ${d.country} tour package, ${d.title} ${d.days} day itinerary, ${d.title} cost, ${d.title} best time to visit`} />
+                <link rel="canonical" href={`https://tripwithuz.com/destinations/${d.slug}`} />
+                <meta property="og:title" content={`${d.title} — ${d.country} | ${d.days}D/${d.nights}N`} />
+                <meta property="og:description" content={`${d.title} (${d.country}) tour package — ${(d.highlights || []).slice(0, 2).join('. ')}`} />
                 <meta property="og:image" content={d.image} />
                 <meta property="og:type" content="article" />
+                <meta property="og:url" content={`https://tripwithuz.com/destinations/${d.slug}`} />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={`${d.title} — ${d.country} tour package`} />
+                <meta name="twitter:description" content={(d.highlights || []).slice(0, 2).join('. ')} />
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'TouristDestination',
+                    name: d.title,
+                    description: `${d.title} (${d.country}) — ${(d.highlights || []).slice(0, 3).join('. ')}`,
+                    image: [d.image, ...(d.gallery || [])].filter(Boolean).slice(0, 5),
+                    touristType: d.tags || [],
+                    geo: d.geo,
+                    includesAttraction: (d.places || []).slice(0, 12).map((p) => ({
+                        '@type': 'TouristAttraction',
+                        name: p.name,
+                        description: p.description || p.summary,
+                        image: p.image,
+                    })),
+                    aggregateRating: d.rating ? {
+                        '@type': 'AggregateRating',
+                        ratingValue: d.rating,
+                        reviewCount: d.reviews || 10,
+                    } : undefined,
+                })}</script>
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'BreadcrumbList',
+                    itemListElement: [
+                        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://tripwithuz.com/' },
+                        { '@type': 'ListItem', position: 2, name: 'Destinations', item: 'https://tripwithuz.com/' },
+                        { '@type': 'ListItem', position: 3, name: d.title, item: `https://tripwithuz.com/destinations/${d.slug}` },
+                    ],
+                })}</script>
             </Helmet>
 
             {/* Hero */}

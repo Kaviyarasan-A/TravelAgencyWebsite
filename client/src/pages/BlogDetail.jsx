@@ -115,10 +115,20 @@ export default function BlogDetail() {
             <Helmet>
                 <title>{`${blog.seoTitle || blog.title} | ${BRAND.name}`}</title>
                 <meta name="description" content={blog.seoDescription || blog.excerpt} />
+                <meta name="keywords" content={(blog.tags || []).join(', ')} />
+                <link rel="canonical" href={`https://tripwithuz.com/blog/${blog.slug}`} />
                 <meta property="og:title" content={blog.seoTitle || blog.title} />
                 <meta property="og:description" content={blog.seoDescription || blog.excerpt} />
                 {blog.coverImage && <meta property="og:image" content={blog.coverImage} />}
                 <meta property="og:type" content="article" />
+                <meta property="og:url" content={`https://tripwithuz.com/blog/${blog.slug}`} />
+                <meta property="article:published_time" content={blog.createdAt} />
+                <meta property="article:modified_time" content={blog.updatedAt || blog.createdAt} />
+                <meta property="article:author" content={blog.author || 'Trip with uz'} />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={blog.seoTitle || blog.title} />
+                <meta name="twitter:description" content={blog.seoDescription || blog.excerpt} />
+                {blog.coverImage && <meta name="twitter:image" content={blog.coverImage} />}
                 <script type="application/ld+json">
                     {JSON.stringify({
                         '@context': 'https://schema.org',
@@ -127,12 +137,29 @@ export default function BlogDetail() {
                         description: blog.seoDescription || blog.excerpt,
                         image: blog.coverImage,
                         author: { '@type': 'Person', name: blog.author || 'Trip with uz' },
-                        publisher: { '@type': 'Organization', name: BRAND.name },
+                        publisher: {
+                            '@type': 'Organization',
+                            name: BRAND.name,
+                            logo: { '@type': 'ImageObject', url: 'https://tripwithuz.com/logo.png' },
+                        },
                         datePublished: blog.createdAt,
                         dateModified: blog.updatedAt || blog.createdAt,
                         keywords: (blog.tags || []).join(', '),
+                        mainEntityOfPage: {
+                            '@type': 'WebPage',
+                            '@id': `https://tripwithuz.com/blog/${blog.slug}`,
+                        },
                     })}
                 </script>
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'BreadcrumbList',
+                    itemListElement: [
+                        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://tripwithuz.com/' },
+                        { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://tripwithuz.com/blog' },
+                        { '@type': 'ListItem', position: 3, name: blog.title, item: `https://tripwithuz.com/blog/${blog.slug}` },
+                    ],
+                })}</script>
             </Helmet>
 
             <section className="relative h-[52vh] min-h-[380px] overflow-hidden">

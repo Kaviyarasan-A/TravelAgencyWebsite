@@ -39,8 +39,34 @@ export default function Blog() {
     return (
         <>
             <Helmet>
-                <title>Travel Blog & Guides | {BRAND.name}</title>
-                <meta name="description" content="Travel guides, itineraries and tips on India & international destinations, study abroad and overseas business setup from Trip with uz." />
+                <title>Travel Blog — India & International Travel Guides, Study Abroad & Business Setup | {BRAND.name}</title>
+                <meta name="description" content="Detailed travel guides, itineraries and cost breakdowns for Kerala, Goa, Dubai, Bali, Europe and more — plus study-abroad pathways (UK, USA, Canada, Germany) and overseas business setup tips. Updated 2026." />
+                <meta name="keywords" content="travel blog India, travel guides Tamil Nadu, Kerala travel guide, Dubai tour guide, Bali itinerary, study abroad guide, MS in USA from India, study in Canada PR pathway, Dubai business setup guide, Singapore company registration guide" />
+                <link rel="canonical" href="https://tripwithuz.com/blog" />
+                <meta property="og:title" content="Travel Blog & Guides — Trip with uz" />
+                <meta property="og:description" content="In-depth travel itineraries, study-abroad pathways and overseas business setup guides — updated for 2026." />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content="https://tripwithuz.com/logo.png" />
+                <meta property="og:url" content="https://tripwithuz.com/blog" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Travel Blog & Guides | Trip with uz" />
+                <meta name="twitter:description" content="Itineraries, cost guides and visa walkthroughs from a real travel agency." />
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'Blog',
+                    name: 'Trip with uz Travel Blog',
+                    url: 'https://tripwithuz.com/blog',
+                    publisher: { '@id': 'https://tripwithuz.com/#organization' },
+                    description: 'Travel guides, itineraries, study-abroad pathways and overseas business setup tips from Trip with uz.',
+                })}</script>
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'BreadcrumbList',
+                    itemListElement: [
+                        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://tripwithuz.com/' },
+                        { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://tripwithuz.com/blog' },
+                    ],
+                })}</script>
             </Helmet>
 
             <section className="relative bg-ink text-white pt-28 pb-20 lg:pt-32 lg:pb-24 overflow-hidden">

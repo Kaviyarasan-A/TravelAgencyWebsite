@@ -34,8 +34,42 @@ export default function StudyAbroad() {
     return (
         <>
             <Helmet>
-                <title>Study Abroad | Trip with uz</title>
-                <meta name="description" content="Study abroad counselling — 1000+ partner universities in UK, USA, Canada, Australia, Germany and more. Free profile evaluation, scholarship guidance, visa support." />
+                <title>Study Abroad Consultants in Salem, Tamil Nadu | UK · USA · Canada · Australia · Germany | Trip with uz</title>
+                <meta name="description" content="Trip with uz — leading study abroad consultants in Salem, Tamil Nadu. 1000+ partner universities in UK, USA, Canada, Australia, Germany, Ireland and Singapore. Free profile evaluation, SOP help, scholarships, visa support." />
+                <meta name="keywords" content="study abroad consultants Salem, study abroad Tamil Nadu, overseas education Salem, MS in USA from Salem, study in UK from India, study in Canada from India, Germany free tuition, IELTS coaching Salem, student visa consultants Salem" />
+                <link rel="canonical" href="https://tripwithuz.com/study-abroad" />
+                <meta property="og:title" content="Study Abroad Consultants in Salem | UK · USA · Canada · Australia | Trip with uz" />
+                <meta property="og:description" content="1000+ partner universities. Free profile evaluation, scholarship guidance and visa support — from Salem, Tamil Nadu." />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content="https://tripwithuz.com/logo.png" />
+                <meta property="og:url" content="https://tripwithuz.com/study-abroad" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Study Abroad Consultants in Salem — Trip with uz" />
+                <meta name="twitter:description" content="UK, USA, Canada, Australia, Germany — admissions, scholarships, visa, forex, all under one roof." />
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'Service',
+                    name: 'Study Abroad Counselling',
+                    serviceType: 'Overseas education consulting',
+                    provider: { '@id': 'https://tripwithuz.com/#organization' },
+                    areaServed: [
+                        { '@type': 'City', name: 'Salem' },
+                        { '@type': 'State', name: 'Tamil Nadu' },
+                        { '@type': 'Country', name: 'India' },
+                    ],
+                    audience: { '@type': 'EducationalAudience', educationalRole: 'student' },
+                    url: 'https://tripwithuz.com/study-abroad',
+                    description: 'University shortlisting, applications, SOPs, scholarships, student visa, forex and pre-departure support for UK, USA, Canada, Australia, Germany, Ireland, France, Singapore, Dubai and New Zealand.',
+                    offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR', description: 'First profile evaluation is free.' },
+                })}</script>
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'BreadcrumbList',
+                    itemListElement: [
+                        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://tripwithuz.com/' },
+                        { '@type': 'ListItem', position: 2, name: 'Study Abroad', item: 'https://tripwithuz.com/study-abroad' },
+                    ],
+                })}</script>
             </Helmet>
 
             {/* Hero */}

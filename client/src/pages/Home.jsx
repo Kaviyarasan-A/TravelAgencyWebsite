@@ -103,8 +103,8 @@ export default function Home() {
                 <meta name="keywords" content="Salem travels, travel agency in Salem, best travels in Salem, tours from Salem, travel agency Tamil Nadu, tourist agency in India, tours in Tamil Nadu, holidays in Tamil Nadu, Tamil Nadu tour packages, India tour packages, best tours India, Kerala tour packages from Salem, Ooty tour packages, Kodaikanal tour packages, Salem tours and travels, Trip with uz Salem, study abroad consultants Salem, Dubai business setup" />
                 <meta name="geo.region" content="IN-TN" />
                 <meta name="geo.placename" content="Salem, Tamil Nadu, India" />
-                <meta name="geo.position" content="11.6643;78.1460" />
-                <meta name="ICBM" content="11.6643, 78.1460" />
+                <meta name="geo.position" content={`${BRAND.geo.latitude};${BRAND.geo.longitude}`} />
+                <meta name="ICBM" content={`${BRAND.geo.latitude}, ${BRAND.geo.longitude}`} />
                 <meta property="og:title" content="Trip with uz — Best Travel Agency in Salem, Tamil Nadu" />
                 <meta property="og:description" content="Salem's most trusted travel agency. Tour packages across India, Tamil Nadu holidays, international trips, study abroad & business setup. 4.9★ rated by 2,510 travellers." />
                 <meta property="og:type" content="website" />
@@ -138,10 +138,10 @@ export default function Home() {
                     },
                     geo: {
                         '@type': 'GeoCoordinates',
-                        latitude: 11.6643,
-                        longitude: 78.1460,
+                        latitude: BRAND.geo.latitude,
+                        longitude: BRAND.geo.longitude,
                     },
-                    hasMap: 'https://www.google.com/maps/search/?api=1&query=Trip+with+uz+Salem',
+                    hasMap: BRAND.gbp.cidUrl,
                     openingHoursSpecification: [{
                         '@type': 'OpeningHoursSpecification',
                         dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
@@ -170,11 +170,10 @@ export default function Home() {
                         worstRating: '1',
                     },
                     sameAs: [
+                        BRAND.gbp.shareUrl,
                         BRAND.social.facebook,
                         BRAND.social.instagram,
-                        BRAND.social.twitter,
                         BRAND.social.youtube,
-                        BRAND.social.linkedin,
                     ],
                 })}</script>
                 <script type="application/ld+json">{JSON.stringify({
@@ -187,6 +186,94 @@ export default function Home() {
                         target: 'https://tripwithuz.com/packages?q={search_term_string}',
                         'query-input': 'required name=search_term_string',
                     },
+                })}</script>
+                {/* Service schema — one per vertical, helps Google understand all 3 offerings */}
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@graph': [
+                        {
+                            '@type': 'Service',
+                            name: 'Tour Packages — India & International',
+                            provider: { '@id': 'https://tripwithuz.com/#organization' },
+                            areaServed: { '@type': 'Country', name: 'India' },
+                            serviceType: 'Travel package booking',
+                            url: 'https://tripwithuz.com/packages',
+                            description: 'Customised domestic and international tour packages — Kerala, Ooty, Kodaikanal, Goa, Kashmir, Dubai, Bali, Singapore, Thailand, Europe and more.',
+                        },
+                        {
+                            '@type': 'Service',
+                            name: 'Study Abroad Counselling',
+                            provider: { '@id': 'https://tripwithuz.com/#organization' },
+                            areaServed: { '@type': 'Country', name: 'India' },
+                            serviceType: 'Overseas education consulting',
+                            url: 'https://tripwithuz.com/study-abroad',
+                            description: 'University admissions, scholarships and visa support for UK, USA, Canada, Australia, Germany, Ireland and more.',
+                        },
+                        {
+                            '@type': 'Service',
+                            name: 'Business Setup Abroad',
+                            provider: { '@id': 'https://tripwithuz.com/#organization' },
+                            areaServed: { '@type': 'Country', name: 'India' },
+                            serviceType: 'Company formation and licensing',
+                            url: 'https://tripwithuz.com/business-setup',
+                            description: 'Company registration, licensing, banking and tax structuring in Dubai, Singapore, USA, UK, Canada and more.',
+                        },
+                    ],
+                })}</script>
+                {/* FAQ schema — boosts SERP real estate; pulled from real customer questions */}
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'FAQPage',
+                    mainEntity: [
+                        {
+                            '@type': 'Question',
+                            name: 'Which is the best travel agency in Salem, Tamil Nadu?',
+                            acceptedAnswer: {
+                                '@type': 'Answer',
+                                text: 'Trip with uz is one of the best-rated travel agencies in Salem, Tamil Nadu — 4.9★ from 2,500+ travellers. We offer customised tour packages across India and internationally, plus study abroad and business setup services. Visit our office at Narasothipatti, Salem or call +91 90870 06777.',
+                            },
+                        },
+                        {
+                            '@type': 'Question',
+                            name: 'What tour packages do you offer from Salem?',
+                            acceptedAnswer: {
+                                '@type': 'Answer',
+                                text: 'We offer domestic packages — Kerala, Ooty, Kodaikanal, Munnar, Goa, Kashmir, Andaman, Rajasthan — and international tours to Dubai, Bali, Singapore, Thailand, Maldives, Europe and more. Every package includes hotels, transport, sightseeing and 24/7 support.',
+                            },
+                        },
+                        {
+                            '@type': 'Question',
+                            name: 'Do you arrange honeymoon packages?',
+                            acceptedAnswer: {
+                                '@type': 'Answer',
+                                text: 'Yes — we specialise in honeymoon packages for Indian couples to Bali, Maldives, Andaman, Kerala, Kashmir, Switzerland, Dubai and more. All packages include romantic hotel upgrades, candlelight dinners and private transfers.',
+                            },
+                        },
+                        {
+                            '@type': 'Question',
+                            name: 'How do I book a tour with Trip with uz?',
+                            acceptedAnswer: {
+                                '@type': 'Answer',
+                                text: 'You can call +91 90870 06777, WhatsApp us, fill our enquiry form, or visit our Salem office. We send a personalised quotation within 24 hours, and you can confirm with a small advance.',
+                            },
+                        },
+                        {
+                            '@type': 'Question',
+                            name: 'Do you provide study abroad counselling?',
+                            acceptedAnswer: {
+                                '@type': 'Answer',
+                                text: 'Yes. We help students apply to 1000+ partner universities in the UK, USA, Canada, Australia, Germany, Ireland and Singapore — from shortlisting and SOPs to scholarships, visa, forex and pre-departure support. The first counselling session is free.',
+                            },
+                        },
+                        {
+                            '@type': 'Question',
+                            name: 'Where is your office located?',
+                            acceptedAnswer: {
+                                '@type': 'Answer',
+                                text: 'Our office is at No. 2/113, Narasothipatti, Opposite Amman Bakery, Salem – 636004, Tamil Nadu, India. Open Monday to Saturday, 9 AM – 8 PM IST.',
+                            },
+                        },
+                    ],
                 })}</script>
             </Helmet>
 

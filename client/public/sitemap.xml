@@ -1,52 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <!-- Core pages -->
-    <url><loc>https://tripwithuz.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-    <url><loc>https://tripwithuz.com/packages</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-    <url><loc>https://tripwithuz.com/study-abroad</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-    <url><loc>https://tripwithuz.com/business-setup</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-    <url><loc>https://tripwithuz.com/blog</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-    <url><loc>https://tripwithuz.com/about</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-    <url><loc>https://tripwithuz.com/contact</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-    <url><loc>https://tripwithuz.com/careers</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-    <url><loc>https://tripwithuz.com/terms</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
-    <url><loc>https://tripwithuz.com/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+    <url><loc>https://tripwithuz.com/</loc><lastmod>2026-05-12</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+    <url><loc>https://tripwithuz.com/packages</loc><lastmod>2026-05-12</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+    <url><loc>https://tripwithuz.com/study-abroad</loc><lastmod>2026-05-12</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+    <url><loc>https://tripwithuz.com/business-setup</loc><lastmod>2026-05-12</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+    <url><loc>https://tripwithuz.com/blog</loc><lastmod>2026-05-12</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+    <url><loc>https://tripwithuz.com/about</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+    <url><loc>https://tripwithuz.com/contact</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/careers</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+    <url><loc>https://tripwithuz.com/terms</loc><lastmod>2026-05-12</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
+    <url><loc>https://tripwithuz.com/privacy</loc><lastmod>2026-05-12</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
 
     <!-- Packages -->
-    <url><loc>https://tripwithuz.com/packages/kerala-gods-own-country</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-    <url><loc>https://tripwithuz.com/packages/goa-beach-bliss</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-    <url><loc>https://tripwithuz.com/packages/karnataka-adventure</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-    <url><loc>https://tripwithuz.com/packages/tamil-nadu-temples-hills</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-    <url><loc>https://tripwithuz.com/packages/maharashtra-explorer</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-    <url><loc>https://tripwithuz.com/packages/delhi-agra-heritage</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-    <url><loc>https://tripwithuz.com/packages/telangana-discovery</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-    <url><loc>https://tripwithuz.com/packages/dubai-desert-luxury</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-    <url><loc>https://tripwithuz.com/packages/singapore-malaysia-explorer</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-    <url><loc>https://tripwithuz.com/packages/bali-honeymoon-escape</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-    <url><loc>https://tripwithuz.com/packages/europe-4-country-grand-tour</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/packages/kerala-gods-own-country</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/packages/goa-beach-bliss</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/packages/karnataka-adventure</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/packages/tamil-nadu-temples-hills</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/packages/maharashtra-explorer</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/packages/delhi-agra-heritage</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/packages/telangana-discovery</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/packages/dubai-desert-luxury</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/packages/singapore-malaysia-explorer</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/packages/bali-honeymoon-escape</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/packages/europe-4-country-grand-tour</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 
     <!-- Blog posts (all high-value SEO targets) -->
-    <url><loc>https://tripwithuz.com/blog/kerala-backwaters-first-time-traveler-guide</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
-    <url><loc>https://tripwithuz.com/blog/dubai-vs-singapore-business-setup-2026</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
-    <url><loc>https://tripwithuz.com/blog/uk-student-visa-september-2026-intake-timeline</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
-    <url><loc>https://tripwithuz.com/blog/goa-monsoon-2026-itinerary-what-locals-do</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
-    <url><loc>https://tripwithuz.com/blog/south-india-food-trail-7-day-itinerary</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
-    <url><loc>https://tripwithuz.com/blog/dubai-tour-package-from-india-cost-guide-2026</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-    <url><loc>https://tripwithuz.com/blog/bali-tour-package-from-india-2026-complete-guide</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-    <url><loc>https://tripwithuz.com/blog/europe-tour-package-from-india-schengen-visa-cost</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-    <url><loc>https://tripwithuz.com/blog/study-in-canada-from-india-2026-complete-pr-pathway</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-    <url><loc>https://tripwithuz.com/blog/ms-in-usa-from-india-2026-complete-guide</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-    <url><loc>https://tripwithuz.com/blog/study-in-germany-free-tuition-for-indian-students</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-    <url><loc>https://tripwithuz.com/blog/dubai-business-setup-from-india-2026-freezone-mainland</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-    <url><loc>https://tripwithuz.com/blog/singapore-company-registration-from-india-guide</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/blog/kerala-backwaters-first-time-traveler-guide</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+    <url><loc>https://tripwithuz.com/blog/dubai-vs-singapore-business-setup-2026</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+    <url><loc>https://tripwithuz.com/blog/uk-student-visa-september-2026-intake-timeline</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+    <url><loc>https://tripwithuz.com/blog/goa-monsoon-2026-itinerary-what-locals-do</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+    <url><loc>https://tripwithuz.com/blog/south-india-food-trail-7-day-itinerary</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+    <url><loc>https://tripwithuz.com/blog/dubai-tour-package-from-india-cost-guide-2026</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/blog/bali-tour-package-from-india-2026-complete-guide</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/blog/europe-tour-package-from-india-schengen-visa-cost</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/blog/study-in-canada-from-india-2026-complete-pr-pathway</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/blog/ms-in-usa-from-india-2026-complete-guide</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/blog/study-in-germany-free-tuition-for-indian-students</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/blog/dubai-business-setup-from-india-2026-freezone-mainland</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+    <url><loc>https://tripwithuz.com/blog/singapore-company-registration-from-india-guide</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 
     <!-- Hyper-local + long-tail SEO posts (low competition, high intent) -->
-    <url><loc>https://tripwithuz.com/blog/best-travel-agency-in-salem-2026</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-    <url><loc>https://tripwithuz.com/blog/tour-packages-from-chennai-2026-best-destinations-cost</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
-    <url><loc>https://tripwithuz.com/blog/tour-packages-from-bengaluru-2026-complete-guide</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
-    <url><loc>https://tripwithuz.com/blog/kerala-tour-package-from-tamil-nadu-2026</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
-    <url><loc>https://tripwithuz.com/blog/andaman-tour-package-from-chennai-bengaluru-2026</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
-    <url><loc>https://tripwithuz.com/blog/best-honeymoon-destinations-indian-couples-2026</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
-    <url><loc>https://tripwithuz.com/blog/cheapest-international-tour-packages-from-india-2026</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
-    <url><loc>https://tripwithuz.com/blog/best-family-tour-packages-india-2026</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+    <url><loc>https://tripwithuz.com/blog/best-travel-agency-in-salem-2026</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+    <url><loc>https://tripwithuz.com/blog/tour-packages-from-chennai-2026-best-destinations-cost</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
+    <url><loc>https://tripwithuz.com/blog/tour-packages-from-bengaluru-2026-complete-guide</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
+    <url><loc>https://tripwithuz.com/blog/kerala-tour-package-from-tamil-nadu-2026</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
+    <url><loc>https://tripwithuz.com/blog/andaman-tour-package-from-chennai-bengaluru-2026</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
+    <url><loc>https://tripwithuz.com/blog/best-honeymoon-destinations-indian-couples-2026</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
+    <url><loc>https://tripwithuz.com/blog/cheapest-international-tour-packages-from-india-2026</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
+    <url><loc>https://tripwithuz.com/blog/best-family-tour-packages-india-2026</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
 </urlset>

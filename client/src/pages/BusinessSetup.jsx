@@ -36,8 +36,40 @@ export default function BusinessSetup() {
     return (
         <>
             <Helmet>
-                <title>Business Setup Abroad | Trip with uz</title>
-                <meta name="description" content="Company formation, licensing, banking, investor visas and tax structuring in Dubai, Singapore, USA, UK, Canada and more." />
+                <title>Business Setup Abroad — Dubai · Singapore · USA · UK Company Registration | Trip with uz Salem</title>
+                <meta name="description" content="Trip with uz — overseas business setup consultants in Salem, Tamil Nadu. Company formation, licensing, banking, investor visas and tax structuring in Dubai, Singapore, USA, UK, Canada, Hong Kong and more. Dedicated setup manager." />
+                <meta name="keywords" content="business setup Dubai from India, Dubai company registration, Singapore company registration from India, USA LLC formation from India, UK Ltd company setup, Hong Kong company registration, freezone company Dubai, mainland company UAE, offshore company setup, investor visa consultants Salem" />
+                <link rel="canonical" href="https://tripwithuz.com/business-setup" />
+                <meta property="og:title" content="Business Setup Abroad — Dubai, Singapore, USA, UK | Trip with uz" />
+                <meta property="og:description" content="Company formation, banking, licensing and investor visas in 20+ jurisdictions. Dedicated setup manager from Salem." />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content="https://tripwithuz.com/logo.png" />
+                <meta property="og:url" content="https://tripwithuz.com/business-setup" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Business Setup Abroad — Trip with uz Salem" />
+                <meta name="twitter:description" content="Dubai · Singapore · USA · UK · Canada — company formation + banking + visas under one roof." />
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'Service',
+                    name: 'Overseas Business Setup',
+                    serviceType: 'Company formation and licensing',
+                    provider: { '@id': 'https://tripwithuz.com/#organization' },
+                    areaServed: [
+                        { '@type': 'City', name: 'Salem' },
+                        { '@type': 'State', name: 'Tamil Nadu' },
+                        { '@type': 'Country', name: 'India' },
+                    ],
+                    url: 'https://tripwithuz.com/business-setup',
+                    description: 'End-to-end company registration, business licensing, corporate banking, investor visa filing and tax structuring across Dubai, Singapore, USA, UK, Canada, Hong Kong, Malaysia, Estonia and more.',
+                })}</script>
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'BreadcrumbList',
+                    itemListElement: [
+                        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://tripwithuz.com/' },
+                        { '@type': 'ListItem', position: 2, name: 'Business Setup', item: 'https://tripwithuz.com/business-setup' },
+                    ],
+                })}</script>
             </Helmet>
 
             {/* Hero */}
