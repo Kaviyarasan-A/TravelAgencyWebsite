@@ -58,11 +58,15 @@ export default function BookingModal({ open, onClose, pkg }) {
         };
     }, [open, onClose]);
 
-    const basePrice = Number(pkg?.basePrice) || 18000;
+    const basePrice = Number(pkg?.basePrice) || 0;
+    const hasPrice = basePrice > 0;
     const room = ROOM_OPTS.find((r) => r.key === form.room) || ROOM_OPTS[0];
     const season = SEASON_OPTS.find((s) => s.key === form.season) || SEASON_OPTS[0];
 
     const preview = useMemo(() => {
+        if (!hasPrice) {
+            return { perPerson: 0, packageLine: 0, addonLines: [], subtotal: 0, groupDiscount: 0, gst: 0, total: 0 };
+        }
         const perPerson = Math.round(basePrice * room.mult * season.mult);
         const packageLine = perPerson * form.travelers;
         const addonLines = form.addons.map((k) => {
@@ -76,7 +80,7 @@ export default function BookingModal({ open, onClose, pkg }) {
         const gst = Math.round(taxable * GST_RATE);
         const total = taxable + gst;
         return { perPerson, packageLine, addonLines, subtotal, groupDiscount, gst, total };
-    }, [basePrice, room.mult, season.mult, form.travelers, form.addons]);
+    }, [hasPrice, basePrice, room.mult, season.mult, form.travelers, form.addons]);
 
     const toggleAddon = (key) => {
         setForm((f) => ({
@@ -224,11 +228,21 @@ export default function BookingModal({ open, onClose, pkg }) {
                                     <div className="rounded-2xl bg-gradient-to-br from-brand-50 to-amber-50 p-5 border border-brand-200">
                                         <div className="flex items-end justify-between gap-4 flex-wrap">
                                             <div>
-                                                <div className="text-xs uppercase tracking-widest text-brand-600 font-semibold">Live estimate</div>
-                                                <div className="font-display text-3xl font-extrabold text-ink mt-1">
-                                                    ₹{preview.total.toLocaleString('en-IN')}
+                                                <div className="text-xs uppercase tracking-widest text-brand-600 font-semibold">
+                                                    {hasPrice ? 'Live estimate' : 'Custom quote'}
                                                 </div>
-                                                <div className="text-xs text-ink-muted">for {form.travelers} traveller{form.travelers > 1 ? 's' : ''} · incl. 5% GST</div>
+                                                {hasPrice ? (
+                                                    <>
+                                                        <div className="font-display text-3xl font-extrabold text-ink mt-1">
+                                                            ₹{preview.total.toLocaleString('en-IN')}
+                                                        </div>
+                                                        <div className="text-xs text-ink-muted">for {form.travelers} traveller{form.travelers > 1 ? 's' : ''} · incl. 5% GST</div>
+                                                    </>
+                                                ) : (
+                                                    <div className="text-sm text-ink-muted mt-1 max-w-xs">
+                                                        Continue to the next step — we'll prepare a tailored quotation based on your details.
+                                                    </div>
+                                                )}
                                             </div>
                                             <button onClick={goStep2} className="btn-primary">
                                                 Generate quotation <FiArrowRight />
@@ -262,7 +276,9 @@ export default function BookingModal({ open, onClose, pkg }) {
                                     <div className="flex items-center justify-between gap-3 pt-2 flex-wrap">
                                         <div>
                                             <div className="text-xs text-ink-muted uppercase tracking-wider">Your quotation</div>
-                                            <div className="font-display text-2xl font-extrabold text-ink">₹{preview.total.toLocaleString('en-IN')}</div>
+                                            <div className="font-display text-2xl font-extrabold text-ink">
+                                                {hasPrice ? `₹${preview.total.toLocaleString('en-IN')}` : 'On request'}
+                                            </div>
                                         </div>
                                         <div className="flex gap-2">
                                             <button type="button" onClick={() => setStep(1)} className="btn-outline btn-sm">Back</button>
@@ -272,7 +288,7 @@ export default function BookingModal({ open, onClose, pkg }) {
                                         </div>
                                     </div>
                                     <p className="text-[11px] text-ink-muted">
-                                        No payment yet — you'll see the full priced quotation next. You pay via UPI only when you confirm.
+                                        No payment yet — you'll see the full priced quotation next.
                                     </p>
                                 </form>
                             )}

@@ -2,12 +2,10 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiMapPin, FiStar, FiClock, FiHeart, FiArrowRight } from 'react-icons/fi';
-
-function inr(n) { return '₹' + (Number(n) || 0).toLocaleString('en-IN'); }
+import SafeBgImage from './SafeBgImage.jsx';
 
 export default function PackageCard({ pkg, onBook, index = 0 }) {
     const [wish, setWish] = useState(false);
-    const price = pkg.basePrice;
 
     return (
         <motion.article
@@ -18,9 +16,9 @@ export default function PackageCard({ pkg, onBook, index = 0 }) {
             className="group card overflow-hidden hover:shadow-card hover:-translate-y-2 transition-all duration-300 flex flex-col hover-glow"
         >
             <div className="relative h-56 overflow-hidden">
-                <div
+                <SafeBgImage
+                    src={pkg.image}
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                    style={{ backgroundImage: `url(${pkg.image})` }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
 
@@ -60,19 +58,11 @@ export default function PackageCard({ pkg, onBook, index = 0 }) {
                     </span>
                 </div>
 
-                <div className="mt-auto pt-4 border-t border-dashed border-ink-line flex items-end justify-between gap-3">
-                    {price ? (
-                        <div>
-                            <div className="text-[10px] uppercase tracking-wider text-ink-muted font-semibold">Starts from</div>
-                            <div className="font-display text-xl font-extrabold text-ink">{inr(price)}<span className="text-xs font-medium text-ink-muted ml-1">/ person</span></div>
-                        </div>
-                    ) : <span />}
-                    <div className="flex gap-2 shrink-0">
-                        <Link to={`/packages/${pkg.slug}`} className="btn-outline btn-sm">Details</Link>
-                        <button onClick={() => onBook?.(pkg)} className="btn-primary btn-sm">
-                            Book <FiArrowRight />
-                        </button>
-                    </div>
+                <div className="mt-auto pt-4 border-t border-dashed border-ink-line flex items-center justify-end gap-2">
+                    <Link to={`/packages/${pkg.slug}`} className="btn-outline btn-sm">Details</Link>
+                    <button onClick={() => onBook?.(pkg)} className="btn-primary btn-sm">
+                        Book <FiArrowRight />
+                    </button>
                 </div>
             </div>
         </motion.article>

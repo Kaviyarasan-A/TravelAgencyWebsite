@@ -23,7 +23,7 @@ const FEATURED = [
     { name: 'Rajasthan',   country: 'India',      tag: 'Heritage',    image: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=1200&q=80' },
 ];
 
-// Quick keyword → package match so we can show "X tours · from ₹Y"
+// Quick keyword → package match so we can show "X tours" count
 const KEYWORDS = {
     Kerala:    ['kerala', 'munnar', 'alleppey', 'kochi', 'wayanad'],
     Dubai:     ['dubai', 'uae'],
@@ -47,16 +47,13 @@ function matchesDestination(pkg, name) {
     return needles.some((n) => hay.includes(n));
 }
 
-function inr(n) { return '₹' + (Number(n) || 0).toLocaleString('en-IN'); }
-
 export default function DestinationsGrid() {
     const PACKAGES = usePackages();
     const [open, setOpen] = useState(null);
 
     const cards = useMemo(() => FEATURED.map((d) => {
         const matches = PACKAGES.filter((p) => matchesDestination(p, d.name));
-        const lowest = matches.reduce((m, p) => p.basePrice && (!m || p.basePrice < m) ? p.basePrice : m, null);
-        return { ...d, count: matches.length, from: lowest };
+        return { ...d, count: matches.length };
     }), [PACKAGES]);
 
     return (
@@ -115,12 +112,6 @@ export default function DestinationsGrid() {
                                         <>
                                             <span className="font-semibold text-white">{d.count}</span>
                                             <span>tour{d.count > 1 ? 's' : ''}</span>
-                                            {d.from && (
-                                                <>
-                                                    <span className="w-px h-3 bg-white/30" />
-                                                    <span>from <b className="text-brand-400">{inr(d.from)}</b></span>
-                                                </>
-                                            )}
                                         </>
                                     ) : (
                                         <span className="text-white/70">Custom trips available</span>

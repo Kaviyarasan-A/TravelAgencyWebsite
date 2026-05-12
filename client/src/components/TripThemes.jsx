@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiArrowRight, FiStar, FiClock, FiHeart, FiUsers, FiCompass, FiSun } from 'react-icons/fi';
 import { usePackages } from '../hooks/usePackages.js';
+import SafeBgImage from './SafeBgImage.jsx';
 
 const THEMES = [
     { key: 'all',       label: 'All',        icon: <FiCompass />,  match: () => true },
@@ -12,8 +13,6 @@ const THEMES = [
     { key: 'luxury',    label: 'Luxury',     icon: <FiStar />,     match: (p) => (p.tags || []).some((t) => /luxury/i.test(t)) || (p.basePrice || 0) >= 60000 },
     { key: 'adventure', label: 'Adventure',  icon: <FiCompass />,  match: (p) => (p.tags || []).some((t) => /adventure|nature|mountain|hill/i.test(t)) },
 ];
-
-function inr(n) { return '₹' + (Number(n) || 0).toLocaleString('en-IN'); }
 
 export default function TripThemes() {
     const [active, setActive] = useState('all');
@@ -77,9 +76,9 @@ export default function TripThemes() {
                                     className="group block bg-white rounded-2xl overflow-hidden border border-ink-line/60 hover:border-transparent hover:shadow-card hover:-translate-y-1 transition duration-300"
                                 >
                                     <div className="relative h-44 overflow-hidden">
-                                        <div
+                                        <SafeBgImage
+                                            src={p.image}
                                             className="absolute inset-0 bg-cover bg-center transition-transform duration-[900ms] group-hover:scale-110"
-                                            style={{ backgroundImage: `url(${p.image})` }}
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent" />
                                         <span className="absolute top-2.5 left-2.5 text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-white/95 text-ink">
@@ -95,16 +94,7 @@ export default function TripThemes() {
                                             {p.title}
                                         </h3>
                                         <p className="text-[11px] text-ink-muted mt-1 line-clamp-1">{p.city}, {p.country}</p>
-                                        <div className="mt-3 flex items-end justify-between">
-                                            {p.basePrice ? (
-                                                <div>
-                                                    <div className="text-[9px] uppercase tracking-widest text-ink-muted font-bold">From</div>
-                                                    <div className="font-display font-extrabold text-ink text-[17px]"
-                                                        style={{ letterSpacing: '-0.02em' }}>
-                                                        {inr(p.basePrice)}
-                                                    </div>
-                                                </div>
-                                            ) : <span />}
+                                        <div className="mt-3 flex items-center justify-end">
                                             <span className="inline-flex items-center gap-1 text-xs font-semibold text-brand-500 group-hover:gap-2 transition-all">
                                                 Details <FiArrowRight size={12} />
                                             </span>

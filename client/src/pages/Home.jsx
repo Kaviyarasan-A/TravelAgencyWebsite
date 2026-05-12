@@ -98,23 +98,36 @@ export default function Home() {
     return (
         <>
             <Helmet>
-                <title>Trip with uz | Tours, Study Abroad & Business Setup</title>
-                <meta name="description" content="Best travel agency in India for domestic & international tour packages, study abroad consulting and overseas business setup. 120+ destinations, 15+ years, 25,000+ happy travellers." />
-                <meta name="keywords" content="travel agency Salem, tour packages India, study abroad consultants, dubai business setup, Kerala tour packages, Bali honeymoon, Europe tour, MS in USA, study in Canada" />
-                <meta property="og:title" content="Trip with uz | Curated Tours, Study Abroad & Business Setup" />
-                <meta property="og:description" content="India's trusted travel + overseas education + business setup partner. Instant quotation, UPI payments, 24/7 support." />
+                <title>Trip with uz — Best Travel Agency in Salem, Tamil Nadu | Tours in India & Abroad</title>
+                <meta name="description" content="Trip with uz is the best travel agency in Salem, Tamil Nadu — offering tour packages across India, Tamil Nadu holiday tours, international trips, study abroad and business setup. 15+ years, 25,000+ travellers, 4.9★ rated." />
+                <meta name="keywords" content="Salem travels, travel agency in Salem, best travels in Salem, tours from Salem, travel agency Tamil Nadu, tourist agency in India, tours in Tamil Nadu, holidays in Tamil Nadu, Tamil Nadu tour packages, India tour packages, best tours India, Kerala tour packages from Salem, Ooty tour packages, Kodaikanal tour packages, Salem tours and travels, Trip with uz Salem, study abroad consultants Salem, Dubai business setup" />
+                <meta name="geo.region" content="IN-TN" />
+                <meta name="geo.placename" content="Salem, Tamil Nadu, India" />
+                <meta name="geo.position" content="11.6643;78.1460" />
+                <meta name="ICBM" content="11.6643, 78.1460" />
+                <meta property="og:title" content="Trip with uz — Best Travel Agency in Salem, Tamil Nadu" />
+                <meta property="og:description" content="Salem's most trusted travel agency. Tour packages across India, Tamil Nadu holidays, international trips, study abroad & business setup. 4.9★ rated by 2,510 travellers." />
                 <meta property="og:type" content="website" />
                 <meta property="og:image" content={BRAND.logo} />
+                <meta property="og:locale" content="en_IN" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Trip with uz — Best Travel Agency in Salem, Tamil Nadu" />
+                <meta name="twitter:description" content="Tour packages in Tamil Nadu, India & abroad. Study abroad + business setup. 25,000+ happy travellers." />
                 <link rel="canonical" href="https://tripwithuz.com/" />
                 <script type="application/ld+json">{JSON.stringify({
                     '@context': 'https://schema.org',
-                    '@type': 'TravelAgency',
+                    '@type': ['TravelAgency', 'LocalBusiness'],
+                    '@id': 'https://tripwithuz.com/#organization',
                     name: BRAND.name,
-                    description: 'Curated holiday packages, overseas education consulting and international business setup services.',
+                    alternateName: ['Trip with uz Salem', 'Tripwithuz Travels'],
+                    description: 'Best travel agency in Salem, Tamil Nadu offering curated tour packages across India and internationally, plus study abroad and business setup services.',
                     url: 'https://tripwithuz.com',
                     logo: 'https://tripwithuz.com/logo.png',
-                    telephone: BRAND.phone,
+                    image: 'https://tripwithuz.com/logo.png',
+                    telephone: [BRAND.phone, BRAND.phone2],
                     email: BRAND.email,
+                    priceRange: '₹₹',
+                    foundingDate: '2010',
                     address: {
                         '@type': 'PostalAddress',
                         streetAddress: 'No. 2/113, Narasothipatti, Opposite Amman Bakery',
@@ -123,18 +136,57 @@ export default function Home() {
                         postalCode: '636004',
                         addressCountry: 'IN',
                     },
-                    openingHours: 'Mo-Sa 09:00-20:00',
+                    geo: {
+                        '@type': 'GeoCoordinates',
+                        latitude: 11.6643,
+                        longitude: 78.1460,
+                    },
+                    hasMap: 'https://www.google.com/maps/search/?api=1&query=Trip+with+uz+Salem',
+                    openingHoursSpecification: [{
+                        '@type': 'OpeningHoursSpecification',
+                        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+                        opens: '09:00',
+                        closes: '20:00',
+                    }],
+                    areaServed: [
+                        { '@type': 'City', name: 'Salem' },
+                        { '@type': 'State', name: 'Tamil Nadu' },
+                        { '@type': 'Country', name: 'India' },
+                    ],
+                    serviceType: [
+                        'Tour packages',
+                        'Tamil Nadu tours',
+                        'India holiday packages',
+                        'International tour packages',
+                        'Honeymoon packages',
+                        'Study abroad consulting',
+                        'Business setup services',
+                    ],
                     aggregateRating: {
                         '@type': 'AggregateRating',
                         ratingValue: '4.9',
                         reviewCount: '2510',
+                        bestRating: '5',
+                        worstRating: '1',
                     },
                     sameAs: [
                         BRAND.social.facebook,
                         BRAND.social.instagram,
                         BRAND.social.twitter,
                         BRAND.social.youtube,
+                        BRAND.social.linkedin,
                     ],
+                })}</script>
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'WebSite',
+                    url: 'https://tripwithuz.com',
+                    name: BRAND.name,
+                    potentialAction: {
+                        '@type': 'SearchAction',
+                        target: 'https://tripwithuz.com/packages?q={search_term_string}',
+                        'query-input': 'required name=search_term_string',
+                    },
                 })}</script>
             </Helmet>
 
@@ -410,6 +462,53 @@ export default function Home() {
                     </div>
                     <div className="text-center mt-10">
                         <Link to="/blog" className="btn-outline">View all articles <FiArrowRight /></Link>
+                    </div>
+                </div>
+            </section>
+
+            {/* --- SEO content block — answers what people actually search for --- */}
+            <section className="py-16 lg:py-20 bg-white border-t border-ink-line/60">
+                <div className="container-x grid lg:grid-cols-2 gap-10 lg:gap-14">
+                    <div>
+                        <span className="eyebrow">Why travellers choose us</span>
+                        <h2 className="section-title">The trusted travel agency in <span className="font-script italic text-brand-500">Salem, Tamil Nadu</span></h2>
+                        <p className="text-ink-muted leading-relaxed mt-4">
+                            <strong>Trip with uz</strong> is one of the <strong>best travel agencies in Salem</strong> — and a trusted name across Tamil Nadu and India. Since 2010 we've helped over 25,000 travellers plan unforgettable <strong>holidays in Tamil Nadu</strong>, <strong>tour packages in India</strong>, and bucket-list international trips. From short weekend escapes to multi-country journeys, our team handcrafts every itinerary, vets every stay, and stays available on WhatsApp 24/7.
+                        </p>
+                        <p className="text-ink-muted leading-relaxed mt-4">
+                            Walk into our office at Narasothipatti, Salem or talk to us online — we'll plan everything from <strong>Salem tours</strong> to <strong>Kerala packages</strong>, <strong>Ooty &amp; Kodaikanal trips</strong>, North India heritage tours, Dubai, Bali, Singapore, Europe, and beyond.
+                        </p>
+                    </div>
+
+                    <div>
+                        <span className="eyebrow">Popular searches</span>
+                        <h2 className="section-title">What we plan for travellers across India</h2>
+                        <div className="mt-4 grid sm:grid-cols-2 gap-2.5">
+                            {[
+                                { label: 'Tours in Tamil Nadu',      to: '/packages?region=South%20India' },
+                                { label: 'Holidays in Tamil Nadu',   to: '/packages?category=Domestic&region=South%20India' },
+                                { label: 'Ooty tour packages',       to: '/packages?q=Ooty' },
+                                { label: 'Kodaikanal tour packages', to: '/packages?q=Kodaikanal' },
+                                { label: 'Kerala tour packages',     to: '/packages?q=Kerala' },
+                                { label: 'Pondicherry tours',        to: '/packages?q=Pondicherry' },
+                                { label: 'Goa tour packages',        to: '/packages?q=Goa' },
+                                { label: 'Rajasthan tour packages',  to: '/packages?q=Rajasthan' },
+                                { label: 'Kashmir tour packages',    to: '/packages?q=Kashmir' },
+                                { label: 'Dubai tour packages',      to: '/packages?q=Dubai' },
+                                { label: 'Bali honeymoon packages',  to: '/packages?q=Bali' },
+                                { label: 'Singapore tour packages',  to: '/packages?q=Singapore' },
+                                { label: 'Europe tour packages',     to: '/packages?q=Europe' },
+                                { label: 'Honeymoon packages',       to: '/packages?tag=Honeymoon' },
+                                { label: 'Family tour packages',     to: '/packages?type=family' },
+                                { label: 'Group tours from Salem',   to: '/contact' },
+                            ].map((t) => (
+                                <Link key={t.label} to={t.to}
+                                    className="inline-flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border border-ink-line/70 bg-white hover:border-brand-400 hover:bg-brand-50 hover:text-brand-600 text-[13px] font-display font-semibold text-ink transition">
+                                    <span>{t.label}</span>
+                                    <FiArrowRight size={12} className="text-brand-500 shrink-0" />
+                                </Link>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>

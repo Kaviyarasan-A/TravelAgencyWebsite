@@ -185,16 +185,27 @@ export default function Packages() {
         if (sort === 'days-low')   list = [...list].sort((a, b) => a.days - b.days);
         if (sort === 'days-high')  list = [...list].sort((a, b) => b.days - a.days);
         if (sort === 'rating')     list = [...list].sort((a, b) => b.rating - a.rating);
-        if (sort === 'price-low')  list = [...list].sort((a, b) => (a.basePrice || 0) - (b.basePrice || 0));
-        if (sort === 'price-high') list = [...list].sort((a, b) => (b.basePrice || 0) - (a.basePrice || 0));
         return list;
     }, [tag, q, sort, category, region, tripType, PACKAGES, seasonSlugs]);
 
     return (
         <>
             <Helmet>
-                <title>Holiday Packages | Trip with uz</title>
-                <meta name="description" content="Browse curated domestic & international holiday packages — beaches, hill stations, heritage tours, Dubai, Bali, Europe and more. Customisable itineraries." />
+                <title>Tour Packages in India & Tamil Nadu | Holiday Packages | Trip with uz Salem</title>
+                <meta name="description" content={`Browse ${PACKAGES.length}+ curated tour packages — Tamil Nadu holidays, India tour packages, Kerala, Ooty, Kodaikanal, Goa, Rajasthan, Dubai, Bali, Europe. Best travel agency in Salem with customisable itineraries and instant quotation.`} />
+                <meta name="keywords" content="tour packages India, Tamil Nadu tour packages, holidays in Tamil Nadu, tours in Tamil Nadu, Salem tour packages, Kerala tour packages, Ooty tour packages, Kodaikanal tour packages, Goa tour packages, Rajasthan tour packages, Dubai tour packages, Bali tour packages, Europe tour packages, honeymoon packages, family tour packages, best tours India" />
+                <meta property="og:title" content="Tour Packages in India & Tamil Nadu | Trip with uz Salem" />
+                <meta property="og:description" content="Tamil Nadu holidays, India tours and international packages. Customisable itineraries and instant quotation from Salem's most trusted travel agency." />
+                <meta property="og:type" content="website" />
+                <link rel="canonical" href="https://tripwithuz.com/packages" />
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'BreadcrumbList',
+                    itemListElement: [
+                        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://tripwithuz.com/' },
+                        { '@type': 'ListItem', position: 2, name: 'Tour Packages', item: 'https://tripwithuz.com/packages' },
+                    ],
+                })}</script>
             </Helmet>
 
             {/* Cinematic video-feel hero — Ken-Burns travel slideshow with floating particles */}
@@ -209,10 +220,12 @@ export default function Packages() {
                         </div>
                         <h1 className="font-display font-bold text-white leading-[0.95]"
                             style={{ fontSize: 'clamp(32px, 5vw, 56px)', letterSpacing: '-0.03em' }}>
-                            Find your <span className="text-brand-500">kind</span> of trip.
+                            Tour packages in <span className="text-brand-500">India</span>,<br />
+                            Tamil Nadu &amp; abroad.
                         </h1>
                         <p className="mt-4 text-white/70 max-w-lg text-[15px] leading-relaxed">
-                            Domestic escapes, international bucket-list journeys. Stays + tours bundled,
+                            Browse handpicked holidays from Salem — Kerala backwaters, Ooty hill stations, Kodaikanal,
+                            Goa beaches, Rajasthan heritage, Dubai, Bali and Europe. Stays + tours bundled,
                             fully customisable, cancellation flexible.
                         </p>
                     </div>
@@ -385,8 +398,6 @@ export default function Packages() {
                         <select value={sort} onChange={(e) => setSort(e.target.value)}
                             className="w-full h-12 pl-11 pr-9 rounded-full border border-ink-line/70 bg-white text-[13.5px] font-display font-semibold text-ink appearance-none cursor-pointer transition-all duration-300 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 hover:border-brand-300 shadow-soft">
                             <option value="popular">Most popular</option>
-                            <option value="price-low">Price · Low to High</option>
-                            <option value="price-high">Price · High to Low</option>
                             <option value="days-low">Duration · Short to Long</option>
                             <option value="days-high">Duration · Long to Short</option>
                             <option value="rating">Top-rated</option>

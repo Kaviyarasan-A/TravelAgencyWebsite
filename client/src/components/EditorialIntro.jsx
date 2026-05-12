@@ -62,21 +62,42 @@ export default function EditorialIntro() {
                         </Link>
                     </div>
 
-                    {/* Mini divider with credit line */}
-                    <div className="mt-10 pt-7 border-t border-ink-line/70 grid grid-cols-3 gap-4 max-w-md">
-                        <div>
-                            <div className="font-display text-2xl font-extrabold text-ink" style={{ letterSpacing: '-0.02em' }}>15+</div>
-                            <div className="text-[10px] uppercase tracking-[2px] text-ink-muted mt-1">Years crafting trips</div>
+                    {/* Stat row — large, prominent, full-width */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 16 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.4 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                        className="mt-12 pt-8 border-t-2 border-ink-line/70 grid grid-cols-3 gap-6 sm:gap-8"
+                    >
+                        <div className="text-center sm:text-left">
+                            <div className="font-display font-extrabold text-ink leading-none"
+                                style={{ fontSize: 'clamp(36px, 5.5vw, 60px)', letterSpacing: '-0.035em' }}>
+                                15<span className="text-brand-500">+</span>
+                            </div>
+                            <div className="text-[11px] sm:text-[12px] uppercase tracking-[2.5px] text-ink-muted mt-3 font-semibold">
+                                Years crafting<br className="hidden sm:inline" /> trips
+                            </div>
                         </div>
-                        <div>
-                            <div className="font-display text-2xl font-extrabold text-ink" style={{ letterSpacing: '-0.02em' }}>120<span className="text-brand-500">+</span></div>
-                            <div className="text-[10px] uppercase tracking-[2px] text-ink-muted mt-1">Destinations</div>
+                        <div className="text-center sm:text-left border-x border-ink-line/60 px-4 sm:px-6">
+                            <div className="font-display font-extrabold text-ink leading-none"
+                                style={{ fontSize: 'clamp(36px, 5.5vw, 60px)', letterSpacing: '-0.035em' }}>
+                                120<span className="text-brand-500">+</span>
+                            </div>
+                            <div className="text-[11px] sm:text-[12px] uppercase tracking-[2.5px] text-ink-muted mt-3 font-semibold">
+                                Destinations
+                            </div>
                         </div>
-                        <div>
-                            <div className="font-display text-2xl font-extrabold text-ink" style={{ letterSpacing: '-0.02em' }}>4.9<span className="text-brand-500">★</span></div>
-                            <div className="text-[10px] uppercase tracking-[2px] text-ink-muted mt-1">2,510 reviews</div>
+                        <div className="text-center sm:text-left">
+                            <div className="font-display font-extrabold text-ink leading-none inline-flex items-baseline gap-1"
+                                style={{ fontSize: 'clamp(36px, 5.5vw, 60px)', letterSpacing: '-0.035em' }}>
+                                4.9<span className="text-brand-500 text-[0.7em]">★</span>
+                            </div>
+                            <div className="text-[11px] sm:text-[12px] uppercase tracking-[2.5px] text-ink-muted mt-3 font-semibold">
+                                2,510 reviews
+                            </div>
                         </div>
-                    </div>
+                    </motion.div>
                 </motion.div>
 
                 {/* RIGHT — Photo collage */}

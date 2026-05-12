@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiArrowRight, FiMapPin, FiClock, FiStar, FiSearch } from 'react-icons/fi';
 import { usePackages } from '../hooks/usePackages.js';
+import SafeBgImage from './SafeBgImage.jsx';
 
 /**
  * Keyword index for matching a destination (state/city) to relevant packages.
@@ -103,10 +104,7 @@ export default function DestinationPopup({ destination, open, onClose }) {
                                     {destination.name}
                                 </h3>
                                 <p className="text-sm text-white/85 mt-1">
-                                    {matched.length} tour{matched.length !== 1 ? 's' : ''} available · starting from{' '}
-                                    {matched.length > 0
-                                        ? '₹' + Math.min(...matched.map((p) => p.basePrice || Infinity)).toLocaleString('en-IN')
-                                        : '—'}
+                                    {matched.length} tour{matched.length !== 1 ? 's' : ''} available
                                 </p>
                             </div>
                         </div>
@@ -142,17 +140,12 @@ export default function DestinationPopup({ destination, open, onClose }) {
                                                     onClick={onClose}
                                                     className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-card hover:-translate-y-1 transition-all duration-300 border border-ink-line"
                                                 >
-                                                    <div className="relative h-40 bg-cover bg-center overflow-hidden"
-                                                        style={{ backgroundImage: `url(${p.image})` }}>
+                                                    <div className="relative h-40 overflow-hidden">
+                                                        <SafeBgImage src={p.image} className="absolute inset-0 bg-cover bg-center" />
                                                         <div className="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent transition-transform duration-700 group-hover:scale-110" />
                                                         <span className="absolute top-2 left-2 text-[10px] font-bold uppercase px-2 py-1 rounded bg-white/90 text-ink">
                                                             {p.days}D / {p.nights}N
                                                         </span>
-                                                        {p.basePrice > 0 && (
-                                                            <span className="absolute bottom-2 left-2 text-xs font-bold px-2 py-1 rounded-full bg-brand-500 text-white">
-                                                                From ₹{p.basePrice.toLocaleString('en-IN')}
-                                                            </span>
-                                                        )}
                                                     </div>
                                                     <div className="p-4">
                                                         <h4 className="font-display font-bold text-ink leading-tight line-clamp-2 group-hover:text-brand-500 transition-colors">

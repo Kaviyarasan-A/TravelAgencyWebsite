@@ -2,19 +2,18 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import {
-    FiCheck, FiDownload, FiArrowLeft, FiPhone, FiMessageCircle, FiClock, FiShield,
-    FiSmartphone, FiCopy, FiAlertCircle, FiCheckCircle,
+    FiCheck, FiArrowLeft, FiPhone, FiMessageCircle, FiClock, FiShield,
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { api } from '../api.js';
 import { BRAND } from '../data.js';
 
 const STATUS_META = {
-    pending_confirmation:       { label: 'Quotation ready',             cls: 'bg-blue-50 text-blue-700 border-blue-200' },
-    pending_payment:            { label: 'Awaiting UPI payment',        cls: 'bg-amber-50 text-amber-700 border-amber-200' },
-    paid_pending_verification:  { label: 'Payment reported — verifying',cls: 'bg-violet-50 text-violet-700 border-violet-200' },
-    paid:                       { label: 'Paid & confirmed',            cls: 'bg-green-50 text-green-700 border-green-200' },
-    cancelled:                  { label: 'Cancelled',                   cls: 'bg-red-50 text-red-700 border-red-200' },
+    pending_confirmation:       { label: 'Quotation ready',                cls: 'bg-blue-50 text-blue-700 border-blue-200' },
+    pending_payment:            { label: 'Awaiting payment',               cls: 'bg-amber-50 text-amber-700 border-amber-200' },
+    paid_pending_verification:  { label: 'Payment reported — verifying',   cls: 'bg-violet-50 text-violet-700 border-violet-200' },
+    paid:                       { label: 'Paid & confirmed',               cls: 'bg-green-50 text-green-700 border-green-200' },
+    cancelled:                  { label: 'Cancelled',                      cls: 'bg-red-50 text-red-700 border-red-200' },
 };
 
 function inr(n) { return '₹' + (Number(n) || 0).toLocaleString('en-IN'); }
@@ -22,13 +21,9 @@ function inr(n) { return '₹' + (Number(n) || 0).toLocaleString('en-IN'); }
 export default function Quotation() {
     const { id } = useParams();
     const [booking, setBooking] = useState(null);
-    const [upi, setUpi] = useState(null);
     const [loading, setLoading] = useState(true);
     const [err, setErr] = useState(null);
     const [confirming, setConfirming] = useState(false);
-    const [upiLink, setUpiLink] = useState(null);
-    const [txnRef, setTxnRef] = useState('');
-    const [paying, setPaying] = useState(false);
 
     const load = async () => {
         setLoading(true);
@@ -36,8 +31,6 @@ export default function Quotation() {
         setLoading(false);
         if (!r.ok) { setErr(r.error); return; }
         setBooking(r.data.booking);
-        setUpi(r.data.upi);
-        if (r.data.booking.upiLink) setUpiLink(r.data.booking.upiLink);
     };
     useEffect(() => { load(); /* eslint-disable-next-line */ }, [id]);
 
@@ -47,29 +40,7 @@ export default function Quotation() {
         setConfirming(false);
         if (!r.ok) return toast.error('Could not confirm booking. Please try again.');
         setBooking(r.data.booking);
-        setUpi(r.data.upi);
-        setUpiLink(r.data.upiLink);
-        toast.success('Booking confirmed! Complete payment via UPI.');
-    };
-
-    const openUpiApp = () => {
-        if (!upiLink) return;
-        // On mobile this triggers the UPI intent; on desktop it prompts the user to scan the QR.
-        window.location.href = upiLink;
-    };
-
-    const copyUpi = () => {
-        if (!upi?.payeeVpa) return;
-        navigator.clipboard?.writeText(upi.payeeVpa).then(() => toast.success('UPI ID copied!'));
-    };
-
-    const reportPayment = async () => {
-        setPaying(true);
-        const r = await api.markBookingPaid(id, txnRef);
-        setPaying(false);
-        if (!r.ok) return toast.error('Could not record payment. Please try again.');
-        setBooking(r.data.booking);
-        toast.success('Thanks! Our team will verify and confirm within 2 hours.');
+        toast.success("Booking confirmed! We'll be in touch with payment details.");
     };
 
     if (loading) {
@@ -94,9 +65,6 @@ export default function Quotation() {
     const isPaid = booking.status === 'paid' || booking.status === 'paid_pending_verification';
     const canConfirm = booking.status === 'pending_confirmation';
     const canPay = booking.status === 'pending_payment';
-    const qrSrc = upiLink
-        ? `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(upiLink)}`
-        : null;
 
     return (
         <>
@@ -190,10 +158,10 @@ export default function Quotation() {
                             <div className="card p-6 border-2 border-brand-200 bg-gradient-to-br from-brand-50 to-white">
                                 <div className="text-xs uppercase tracking-widest text-brand-600 font-semibold">Ready to lock it in?</div>
                                 <div className="font-display text-2xl font-extrabold text-ink mt-1">{inr(q.total)}</div>
-                                <p className="text-sm text-ink-muted mt-2">Click confirm to generate your UPI payment link. No money is charged yet.</p>
+                                <p className="text-sm text-ink-muted mt-2">Confirm your quotation and our team will share the payment link with you directly.</p>
                                 <button onClick={confirmBooking} disabled={confirming}
                                     className="btn-primary w-full btn-lg mt-4 disabled:opacity-60">
-                                    <FiCheck /> {confirming ? 'Confirming…' : 'Confirm & Proceed to Pay'}
+                                    <FiCheck /> {confirming ? 'Confirming…' : 'Confirm this Quotation'}
                                 </button>
                                 <div className="flex items-center gap-2 text-[11px] text-ink-muted mt-3">
                                     <FiShield className="text-green-500" /> Free cancellation up to 30 days prior
@@ -201,47 +169,22 @@ export default function Quotation() {
                             </div>
                         )}
 
-                        {canPay && upiLink && (
+                        {canPay && (
                             <div className="card p-6 border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-white">
-                                <div className="text-xs uppercase tracking-widest text-amber-700 font-semibold">Pay via UPI</div>
+                                <div className="text-xs uppercase tracking-widest text-amber-700 font-semibold">Payment</div>
                                 <div className="font-display text-3xl font-extrabold text-ink mt-1">{inr(q.total)}</div>
-
-                                {qrSrc && (
-                                    <div className="mt-4 bg-white p-3 rounded-2xl border border-ink-line flex justify-center">
-                                        <img src={qrSrc} alt="UPI QR code" className="w-56 h-56" />
-                                    </div>
-                                )}
-
-                                <div className="mt-4 space-y-3">
-                                    <button onClick={openUpiApp} className="btn-primary w-full">
-                                        <FiSmartphone /> Open UPI app
-                                    </button>
-
-                                    <div className="bg-white rounded-xl border border-ink-line p-3">
-                                        <div className="text-[11px] uppercase tracking-wider text-ink-muted font-semibold">Or pay to UPI ID</div>
-                                        <div className="flex items-center justify-between mt-1">
-                                            <span className="font-mono text-sm text-ink">{upi?.payeeVpa}</span>
-                                            <button onClick={copyUpi} className="text-brand-500 hover:text-brand-600 p-1" title="Copy">
-                                                <FiCopy />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="text-xs text-ink-muted leading-relaxed bg-blue-50 border border-blue-100 p-3 rounded-xl">
-                                        <div className="font-semibold text-blue-800 mb-1">How to pay</div>
-                                        1. Open any UPI app (GPay / PhonePe / Paytm / BHIM)<br />
-                                        2. Scan QR or pay to <span className="font-mono">{upi?.payeeVpa}</span><br />
-                                        3. Enter amount <b>{inr(q.total)}</b> and add reference <b>{booking.id}</b><br />
-                                        4. After payment, paste the UPI transaction ID below
-                                    </div>
-
-                                    <div>
-                                        <label className="label">UPI Transaction Ref (optional)</label>
-                                        <input className="input" placeholder="e.g. 412589632014" value={txnRef} onChange={(e) => setTxnRef(e.target.value)} />
-                                    </div>
-                                    <button onClick={reportPayment} disabled={paying} className="btn-outline w-full disabled:opacity-60">
-                                        <FiCheckCircle /> {paying ? 'Saving…' : "I've paid — notify the team"}
-                                    </button>
+                                <p className="text-sm text-ink-muted mt-3">
+                                    Your quotation is confirmed. Our team will reach out with a secure payment link shortly.
+                                </p>
+                                <a href={`https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(`Hi, my booking ${booking.id} is confirmed — please share the payment link.`)}`}
+                                    target="_blank" rel="noreferrer" className="btn-primary w-full mt-4">
+                                    <FiMessageCircle /> Chat on WhatsApp
+                                </a>
+                                <a href={`tel:${BRAND.phone.replace(/\s+/g, '')}`} className="btn-outline w-full mt-3">
+                                    <FiPhone /> Call us
+                                </a>
+                                <div className="text-[11px] text-ink-muted bg-blue-50 border border-blue-100 p-3 rounded-xl mt-4">
+                                    Quote our booking reference <b className="font-mono">{booking.id}</b> when you reach out.
                                 </div>
                             </div>
                         )}
@@ -257,7 +200,7 @@ export default function Quotation() {
                                 <p className="text-sm text-ink-muted mt-2">
                                     {booking.status === 'paid'
                                         ? "Your booking is confirmed. We'll be in touch with itinerary details shortly."
-                                        : "Thanks — we'll verify your UPI transaction and confirm your booking within 2 hours. You'll receive an email confirmation."}
+                                        : "Thanks — we'll verify your payment and confirm your booking within 2 hours. You'll receive an email confirmation."}
                                 </p>
                                 <div className="mt-4 p-3 bg-white rounded-xl border border-green-200 text-xs text-left">
                                     <div className="flex justify-between"><span className="text-ink-muted">Amount</span><span className="font-semibold">{inr(q.total)}</span></div>

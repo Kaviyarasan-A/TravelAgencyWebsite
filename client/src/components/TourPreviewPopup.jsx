@@ -5,8 +5,7 @@ import {
     FiX, FiMapPin, FiStar, FiClock, FiArrowRight, FiVolume2, FiVolumeX,
     FiPlay, FiCheck,
 } from 'react-icons/fi';
-
-function inr(n) { return '₹' + (Number(n) || 0).toLocaleString('en-IN'); }
+import SafeBgImage from './SafeBgImage.jsx';
 
 /**
  * Floating virtual-tour preview popup. Shows a centered mini-modal with
@@ -99,9 +98,10 @@ export default function TourPreviewPopup({ pkg, open, onClose }) {
                                     <motion.div
                                         initial={{ scale: 1.08 }} animate={{ scale: videoReady ? 1 : 1.08 }}
                                         transition={{ duration: 1.2 }}
-                                        className="absolute inset-0 bg-cover bg-center"
-                                        style={{ backgroundImage: `url(${pkg.image})` }}
-                                    />
+                                        className="absolute inset-0"
+                                    >
+                                        <SafeBgImage src={pkg.image} className="absolute inset-0 bg-cover bg-center" />
+                                    </motion.div>
                                     <video
                                         ref={videoRef}
                                         src={pkg.tourVideo}
@@ -133,9 +133,10 @@ export default function TourPreviewPopup({ pkg, open, onClose }) {
                                         initial={{ scale: 1.05, x: -20, y: -10 }}
                                         animate={{ scale: 1.15, x: 10, y: 5 }}
                                         transition={{ duration: 10, ease: 'easeInOut', repeat: Infinity, repeatType: 'reverse' }}
-                                        className="absolute inset-0 bg-cover bg-center"
-                                        style={{ backgroundImage: `url(${pkg.image})` }}
-                                    />
+                                        className="absolute inset-0"
+                                    >
+                                        <SafeBgImage src={pkg.image} className="absolute inset-0 bg-cover bg-center" />
+                                    </motion.div>
                                     <div className="absolute top-4 left-4 z-20 inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white bg-black/55 px-2.5 py-1 rounded-full">
                                         <FiPlay size={10} /> Preview
                                     </div>
@@ -179,13 +180,7 @@ export default function TourPreviewPopup({ pkg, open, onClose }) {
                                 </ul>
                             )}
 
-                            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-dashed border-ink-line">
-                                {pkg.basePrice ? (
-                                    <div>
-                                        <div className="text-[10px] uppercase tracking-widest text-brand-600 font-semibold">Starts from</div>
-                                        <div className="font-display text-2xl font-extrabold text-ink">{inr(pkg.basePrice)}<span className="text-xs font-medium text-ink-muted ml-1">/ person</span></div>
-                                    </div>
-                                ) : <span />}
+                            <div className="flex flex-wrap items-center justify-end gap-3 pt-3 border-t border-dashed border-ink-line">
                                 <Link
                                     to={`/packages/${pkg.slug}`}
                                     className="btn-primary"

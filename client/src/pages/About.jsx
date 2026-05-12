@@ -10,8 +10,18 @@ export default function About() {
     return (
         <>
             <Helmet>
-                <title>About Us | Trip with uz</title>
-                <meta name="description" content="Trip with uz — helping 25,000+ people travel across India and abroad, study overseas and launch companies internationally." />
+                <title>About Trip with uz — Salem's Trusted Travel Agency Since 2010</title>
+                <meta name="description" content="Trip with uz is a leading travel agency in Salem, Tamil Nadu. 15+ years, 25,000+ travellers across India and abroad. Holiday packages, study abroad and overseas business setup — all under one roof." />
+                <meta name="keywords" content="about Trip with uz, travel agency in Salem, best travels in Salem, Salem tours and travels, travel agency Tamil Nadu, tourist agency India" />
+                <link rel="canonical" href="https://tripwithuz.com/about" />
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'AboutPage',
+                    name: 'About Trip with uz',
+                    description: "Salem's trusted travel agency since 2010, planning holiday packages in Tamil Nadu, India and internationally.",
+                    url: 'https://tripwithuz.com/about',
+                    mainEntity: { '@id': 'https://tripwithuz.com/#organization' },
+                })}</script>
             </Helmet>
 
             {/* Hero */}
@@ -25,13 +35,14 @@ export default function About() {
                     </div>
                     <h1 className="font-display font-bold text-white leading-[0.95] max-w-3xl"
                         style={{ fontSize: 'clamp(32px, 5vw, 56px)', letterSpacing: '-0.03em' }}>
-                        15 years of helping people<br />
-                        <span className="text-brand-500">go further.</span>
+                        Salem's most trusted<br />
+                        <span className="text-brand-500">travel agency.</span>
                     </h1>
                     <p className="mt-5 text-white/70 max-w-2xl text-[15px] leading-relaxed">
-                        What started as a small tour desk in Salem is now a dedicated team
-                        that plans holidays across India, places students at global universities and helps founders
-                        launch companies in 20+ jurisdictions.
+                        What started in 2010 as a small tour desk in Salem, Tamil Nadu has grown into a dedicated team
+                        of 30+ planners — handcrafting tour packages across India and abroad, placing students at global
+                        universities and helping founders launch companies in 20+ jurisdictions. We're proud to be one
+                        of the <strong>best travel agencies in Salem</strong> with a 4.9★ rating from over 2,500 travellers.
                     </p>
                 </div>
             </section>

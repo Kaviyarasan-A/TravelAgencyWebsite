@@ -10,8 +10,22 @@ export default function Contact() {
     return (
         <>
             <Helmet>
-                <title>Contact | Trip with uz</title>
-                <meta name="description" content="Get in touch with Trip with uz for holiday packages, study abroad and business setup enquiries. We reply within 24 hours." />
+                <title>Contact Trip with uz Salem — Travel Agency in Tamil Nadu | Call +91 90870 06777</title>
+                <meta name="description" content="Reach Trip with uz at Narasothipatti, Salem, Tamil Nadu. Call +91 90870 06777 or WhatsApp us for tour packages in India, Tamil Nadu holidays, study abroad and business setup. Reply within 24 hours." />
+                <meta name="keywords" content="contact travel agency Salem, Trip with uz contact number, Salem tours and travels phone, travel agency in Salem Narasothipatti, best travels Salem contact" />
+                <meta name="geo.region" content="IN-TN" />
+                <meta name="geo.placename" content="Salem, Tamil Nadu" />
+                <meta name="geo.position" content="11.6643;78.1460" />
+                <meta name="ICBM" content="11.6643, 78.1460" />
+                <link rel="canonical" href="https://tripwithuz.com/contact" />
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'ContactPage',
+                    name: 'Contact Trip with uz',
+                    description: "Travel agency in Salem, Tamil Nadu. Reach us by phone, WhatsApp or visit our office.",
+                    url: 'https://tripwithuz.com/contact',
+                    mainEntity: { '@id': 'https://tripwithuz.com/#organization' },
+                })}</script>
             </Helmet>
 
             {/* Hero */}

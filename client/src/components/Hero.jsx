@@ -25,7 +25,6 @@ const HERO_SLIDES = [
         bg: 'https://images.pexels.com/photos/3881104/pexels-photo-3881104.jpeg?auto=compress&cs=tinysrgb&w=2000',
         sidePic1: 'https://images.pexels.com/photos/3881104/pexels-photo-3881104.jpeg?auto=compress&cs=tinysrgb&w=1000',
         sidePic2: 'https://images.pexels.com/photos/1365425/pexels-photo-1365425.jpeg?auto=compress&cs=tinysrgb&w=1000',
-        priceFrom: 34500,
     },
     {
         location: 'Dubai · UAE',
@@ -36,7 +35,6 @@ const HERO_SLIDES = [
         bg: 'https://images.pexels.com/photos/162031/dubai-tower-arab-khalifa-162031.jpeg?auto=compress&cs=tinysrgb&w=2000',
         sidePic1: 'https://images.pexels.com/photos/162031/dubai-tower-arab-khalifa-162031.jpeg?auto=compress&cs=tinysrgb&w=1000',
         sidePic2: 'https://images.pexels.com/photos/3787839/pexels-photo-3787839.jpeg?auto=compress&cs=tinysrgb&w=1000',
-        priceFrom: 78900,
     },
     {
         location: 'Bali · Indonesia',
@@ -47,7 +45,6 @@ const HERO_SLIDES = [
         bg: 'https://images.pexels.com/photos/2100941/pexels-photo-2100941.jpeg?auto=compress&cs=tinysrgb&w=2000',
         sidePic1: 'https://images.pexels.com/photos/2100941/pexels-photo-2100941.jpeg?auto=compress&cs=tinysrgb&w=1000',
         sidePic2: 'https://images.pexels.com/photos/2166559/pexels-photo-2166559.jpeg?auto=compress&cs=tinysrgb&w=1000',
-        priceFrom: 64500,
     },
 ];
 
@@ -57,8 +54,6 @@ const SEARCH_TABS = [
     { key: 'family',    label: 'Family' },
     { key: 'luxury',    label: 'Luxury' },
 ];
-
-function inr(n) { return '₹' + (Number(n) || 0).toLocaleString('en-IN'); }
 
 // Curated headline pairs that rotate per slide based on the active season.
 // Used as the editorial display text when admin uploads season hero images.
@@ -133,7 +128,6 @@ export default function Hero() {
                     sidePic2: pkgB?.image || otherUrl,
                     sidePkg1: pkgA,
                     sidePkg2: pkgB,
-                    priceFrom: pkgA?.basePrice || fallback.priceFrom,
                     label: seasonal.label || `${seasonName} Journeys`,
                     location: `${seasonName} · ${new Date().getFullYear()}`,
                     title:    customTitle  || headline.title,
@@ -295,24 +289,6 @@ export default function Hero() {
                             className="absolute bottom-0 left-0 w-[52%] h-[220px]"
                             rotate={-4}
                         />
-
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.5, delay: 0.6 }}
-                            className="absolute bottom-6 right-6 bg-white rounded-xl shadow-2xl p-3 pr-4 flex items-center gap-3 ring-1 ring-black/5"
-                        >
-                            <div className="w-9 h-9 rounded-lg bg-brand-500 text-white flex items-center justify-center">
-                                <FiMapPin size={14} />
-                            </div>
-                            <div>
-                                <div className="text-[9px] uppercase tracking-widest text-ink-muted font-bold">Starting from</div>
-                                <div className="font-display font-bold text-ink text-base leading-tight"
-                                    style={{ letterSpacing: '-0.02em' }}>
-                                    {inr(current.priceFrom)}
-                                </div>
-                            </div>
-                        </motion.div>
 
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}

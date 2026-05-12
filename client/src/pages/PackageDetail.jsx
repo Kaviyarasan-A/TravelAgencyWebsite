@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { FiMapPin, FiStar, FiClock, FiCheck, FiX, FiArrowLeft, FiPlay } from 'react-icons/fi';
 import BookingModal from '../components/BookingModal.jsx';
+import SafeBgImage from '../components/SafeBgImage.jsx';
 import { usePackages } from '../hooks/usePackages.js';
 
 export default function PackageDetail() {
@@ -28,9 +29,9 @@ export default function PackageDetail() {
         <>
             <Helmet>
                 <title>{`${pkg.title} | ${pkg.days}D/${pkg.nights}N ${pkg.country} Tour Package | Trip with uz`}</title>
-                <meta name="description" content={`${pkg.title} — ${pkg.days}D/${pkg.nights}N ${pkg.country} tour package from ₹${(pkg.basePrice || 0).toLocaleString('en-IN')}. ${(pkg.highlights || []).slice(0, 2).join('. ')}. Book with instant quotation & UPI payments.`} />
+                <meta name="description" content={`${pkg.title} — ${pkg.days}D/${pkg.nights}N ${pkg.country} tour package. ${(pkg.highlights || []).slice(0, 2).join('. ')}. Book with instant quotation.`} />
                 <meta name="keywords" content={`${pkg.title}, ${pkg.country} tour package, ${pkg.city} trip, ${(pkg.tags || []).join(', ')}, tour package India, ${pkg.days} day ${pkg.country}`} />
-                <meta property="og:title" content={`${pkg.title} — ${pkg.days}D/${pkg.nights}N from ₹${(pkg.basePrice || 0).toLocaleString('en-IN')}`} />
+                <meta property="og:title" content={`${pkg.title} — ${pkg.days}D/${pkg.nights}N ${pkg.country}`} />
                 <meta property="og:description" content={`${pkg.days}D/${pkg.nights}N in ${pkg.city}, ${pkg.country}`} />
                 <meta property="og:image" content={pkg.image} />
                 <meta property="og:type" content="product" />
@@ -47,13 +48,6 @@ export default function PackageDetail() {
                         name: d.t,
                         description: d.c,
                     })),
-                    offers: pkg.basePrice ? {
-                        '@type': 'Offer',
-                        price: pkg.basePrice,
-                        priceCurrency: 'INR',
-                        availability: 'https://schema.org/InStock',
-                        url: `https://tripwithuz.com/packages/${pkg.slug}`,
-                    } : undefined,
                     aggregateRating: pkg.rating ? {
                         '@type': 'AggregateRating',
                         ratingValue: pkg.rating,
@@ -79,9 +73,10 @@ export default function PackageDetail() {
                         initial={{ scale: 1.12, opacity: 0 }}
                         animate={{ scale: 1.0, opacity: 1 }}
                         transition={{ duration: 1.4, ease: 'easeOut' }}
-                        className="absolute inset-0 bg-cover bg-center animate-zoom-slow"
-                        style={{ backgroundImage: `url(${pkg.image})` }}
-                    />
+                        className="absolute inset-0"
+                    >
+                        <SafeBgImage src={pkg.image} className="absolute inset-0 bg-cover bg-center animate-zoom-slow" />
+                    </motion.div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
                 <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent" />
@@ -174,23 +169,12 @@ export default function PackageDetail() {
 
                     {/* Booking card */}
                     <aside className="card p-6 lg:sticky lg:top-24">
-                        {pkg.basePrice ? (
-                            <>
-                                <div className="text-xs uppercase tracking-widest text-brand-500 font-semibold">Starts from</div>
-                                <div className="font-display text-4xl font-extrabold text-ink mt-1">
-                                    ₹{pkg.basePrice.toLocaleString('en-IN')}
-                                    <span className="text-sm font-medium text-ink-muted ml-2">/ person</span>
-                                </div>
-                                <div className="text-xs text-ink-muted mt-1">incl. stays, transfers & sightseeing · taxes calculated at checkout</div>
-                            </>
-                        ) : (
-                            <h3 className="font-display text-2xl font-bold text-ink mb-2">Interested in this trip?</h3>
-                        )}
+                        <h3 className="font-display text-2xl font-bold text-ink mb-2">Interested in this trip?</h3>
+                        <p className="text-sm text-ink-muted">Tell us your dates & travellers — we'll generate a tailored quotation in minutes.</p>
                         <button onClick={() => setBookOpen(true)} className="btn-primary w-full btn-lg mt-5">Book this trip</button>
                         <Link to="/contact" className="btn-outline w-full mt-3">Ask a question</Link>
                         <ul className="mt-5 space-y-2 text-xs text-ink-muted">
                             <li className="flex gap-2"><FiCheck className="text-brand-500" /> Instant quotation · no upfront payment</li>
-                            <li className="flex gap-2"><FiCheck className="text-brand-500" /> UPI secure payment on confirmation</li>
                             <li className="flex gap-2"><FiCheck className="text-brand-500" /> Free cancellation up to 30 days prior</li>
                             <li className="flex gap-2"><FiCheck className="text-brand-500" /> Customizable itineraries</li>
                             <li className="flex gap-2"><FiCheck className="text-brand-500" /> 24/7 travel support</li>
@@ -206,7 +190,9 @@ export default function PackageDetail() {
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {related.map((p) => (
                             <Link to={`/packages/${p.slug}`} key={p.slug} className="card overflow-hidden hover:shadow-card transition">
-                                <div className="h-44 bg-cover bg-center" style={{ backgroundImage: `url(${p.image})` }} />
+                                <div className="relative h-44 overflow-hidden">
+                                    <SafeBgImage src={p.image} className="absolute inset-0 bg-cover bg-center" />
+                                </div>
                                 <div className="p-4">
                                     <div className="text-xs text-ink-muted mb-1">{p.city}, {p.country}</div>
                                     <h3 className="font-display text-lg font-bold">{p.title}</h3>

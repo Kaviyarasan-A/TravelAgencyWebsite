@@ -10,12 +10,11 @@ export default function Footer() {
             <div className="container-x grid md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.4fr] gap-10 pb-12">
                 <div>
                     <Link to="/" className="flex items-center gap-3 mb-4 text-white font-extrabold text-xl" aria-label={BRAND.name}>
-                        <img src={BRAND.logo} alt={BRAND.name} className="h-14 w-auto object-contain bg-white/5 rounded-xl p-1.5" />
+                        <img src={BRAND.logo} alt={`${BRAND.name} — travel agency in Salem, Tamil Nadu`} className="h-14 w-auto object-contain bg-white/5 rounded-xl p-1.5" />
                         <span>{BRAND.name}</span>
                     </Link>
                     <p className="text-sm leading-7 max-w-sm">
-                        Curated holiday packages, study-abroad counselling and business setup services —
-                        trusted by 25,000+ travelers and founders since 2011.
+                        <strong className="text-white">Best travel agency in Salem, Tamil Nadu</strong> — curated holiday packages across India and abroad, plus study-abroad counselling and business setup. Trusted by 25,000+ travellers and founders since 2010.
                     </p>
                     <div className="flex gap-3 mt-5">
                         {[
@@ -34,13 +33,14 @@ export default function Footer() {
                 </div>
 
                 <div>
-                    <h4 className="text-white font-semibold mb-4 text-base">Services</h4>
+                    <h4 className="text-white font-semibold mb-4 text-base">Tour Packages</h4>
                     <ul className="space-y-2 text-sm">
-                        <li><Link to="/packages" className="hover:text-brand-500 hover:translate-x-1 inline-block transition-all duration-200">Holiday Packages</Link></li>
-                        <li><Link to="/study-abroad" className="hover:text-brand-500 hover:translate-x-1 inline-block transition-all duration-200">Study Abroad</Link></li>
-                        <li><Link to="/business-setup" className="hover:text-brand-500 hover:translate-x-1 inline-block transition-all duration-200">Business Setup</Link></li>
-                        <li><Link to="/packages?tag=Beach" className="hover:text-brand-500 hover:translate-x-1 inline-block transition-all duration-200">Beach Tours</Link></li>
-                        <li><Link to="/contact" className="hover:text-brand-500 hover:translate-x-1 inline-block transition-all duration-200">Group Travel</Link></li>
+                        <li><Link to="/packages" className="hover:text-brand-500 hover:translate-x-1 inline-block transition-all duration-200">India Tour Packages</Link></li>
+                        <li><Link to="/packages?category=Domestic&amp;region=South%20India" className="hover:text-brand-500 hover:translate-x-1 inline-block transition-all duration-200">Tamil Nadu Tours</Link></li>
+                        <li><Link to="/packages?q=Kerala" className="hover:text-brand-500 hover:translate-x-1 inline-block transition-all duration-200">Kerala Tour Packages</Link></li>
+                        <li><Link to="/packages?q=Ooty" className="hover:text-brand-500 hover:translate-x-1 inline-block transition-all duration-200">Ooty &amp; Kodaikanal</Link></li>
+                        <li><Link to="/packages?category=International" className="hover:text-brand-500 hover:translate-x-1 inline-block transition-all duration-200">International Tours</Link></li>
+                        <li><Link to="/packages?tag=Honeymoon" className="hover:text-brand-500 hover:translate-x-1 inline-block transition-all duration-200">Honeymoon Packages</Link></li>
                     </ul>
                 </div>
 
@@ -67,9 +67,41 @@ export default function Footer() {
                 </div>
             </div>
 
+            {/* Keyword-rich service area strip — helps Google understand who we serve */}
+            <div className="border-t border-white/10 bg-[#060911]">
+                <div className="container-x py-6">
+                    <h4 className="text-white/85 font-semibold text-xs uppercase tracking-[2.5px] mb-3">Travel Agency Serving</h4>
+                    <p className="text-[12px] leading-6 text-white/55">
+                        <Link to="/packages" className="hover:text-brand-500">Salem</Link> ·
+                        {' '}<Link to="/packages?q=Erode" className="hover:text-brand-500">Erode</Link> ·
+                        {' '}<Link to="/packages?q=Coimbatore" className="hover:text-brand-500">Coimbatore</Link> ·
+                        {' '}<Link to="/packages?q=Namakkal" className="hover:text-brand-500">Namakkal</Link> ·
+                        {' '}<Link to="/packages?q=Tiruchirappalli" className="hover:text-brand-500">Trichy</Link> ·
+                        {' '}<Link to="/packages?q=Madurai" className="hover:text-brand-500">Madurai</Link> ·
+                        {' '}<Link to="/packages?q=Chennai" className="hover:text-brand-500">Chennai</Link> ·
+                        {' '}<Link to="/packages?category=Domestic&amp;region=South%20India" className="hover:text-brand-500">Tamil Nadu</Link> ·
+                        {' '}<Link to="/packages" className="hover:text-brand-500">All India</Link>
+                    </p>
+                    <h4 className="text-white/85 font-semibold text-xs uppercase tracking-[2.5px] mt-5 mb-3">Popular Tour Packages</h4>
+                    <p className="text-[12px] leading-6 text-white/55">
+                        <Link to="/packages?q=Kerala" className="hover:text-brand-500">Kerala Tour Packages</Link> ·
+                        {' '}<Link to="/packages?q=Ooty" className="hover:text-brand-500">Ooty Tour Packages</Link> ·
+                        {' '}<Link to="/packages?q=Kodaikanal" className="hover:text-brand-500">Kodaikanal Tour Packages</Link> ·
+                        {' '}<Link to="/packages?q=Goa" className="hover:text-brand-500">Goa Tour Packages</Link> ·
+                        {' '}<Link to="/packages?q=Rajasthan" className="hover:text-brand-500">Rajasthan Tours</Link> ·
+                        {' '}<Link to="/packages?q=Kashmir" className="hover:text-brand-500">Kashmir Tours</Link> ·
+                        {' '}<Link to="/packages?q=Dubai" className="hover:text-brand-500">Dubai Tour Packages</Link> ·
+                        {' '}<Link to="/packages?q=Bali" className="hover:text-brand-500">Bali Honeymoon</Link> ·
+                        {' '}<Link to="/packages?q=Singapore" className="hover:text-brand-500">Singapore Packages</Link> ·
+                        {' '}<Link to="/packages?q=Europe" className="hover:text-brand-500">Europe Tour Packages</Link> ·
+                        {' '}<Link to="/packages?tag=Honeymoon" className="hover:text-brand-500">Honeymoon Packages</Link> ·
+                        {' '}<Link to="/packages?tag=Family" className="hover:text-brand-500">Family Tour Packages</Link>
+                    </p>
+                </div>
+            </div>
             <div className="border-t border-white/10 bg-[#050810]">
                 <div className="container-x py-5 flex flex-wrap items-center justify-between gap-3 text-xs text-white/55">
-                    <p>&copy; {year} {BRAND.name}. All rights reserved.</p>
+                    <p>&copy; {year} {BRAND.name}. All rights reserved. Travel agency in Salem, Tamil Nadu, India.</p>
                     <p>Crafted with <span className="text-brand-500">♥</span> for modern travelers & founders.</p>
                 </div>
             </div>

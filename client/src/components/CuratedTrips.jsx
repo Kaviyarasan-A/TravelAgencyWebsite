@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiArrowRight, FiChevronLeft, FiChevronRight, FiStar, FiClock } from 'react-icons/fi';
 import { usePackages } from '../hooks/usePackages.js';
+import SafeBgImage from './SafeBgImage.jsx';
 
 /**
  * Horizontal, swipe-able trip carousel — PickYourTrail style.
  * Uses native scroll-snap for smooth touch/trackpad scrolling, plus
  * left/right buttons that scroll by one card width.
  */
-function inr(n) { return '₹' + (Number(n) || 0).toLocaleString('en-IN'); }
 
 export default function CuratedTrips({
     title = 'Curated journeys, ready to go',
@@ -107,9 +107,9 @@ function TripCard({ pkg, index }) {
             className="snap-start shrink-0 w-[290px] sm:w-[320px] bg-white rounded-2xl overflow-hidden shadow-soft hover:shadow-card hover:-translate-y-1 transition duration-300">
             <Link to={`/packages/${pkg.slug}`} className="block group">
                 <div className="relative h-[220px] overflow-hidden">
-                    <div
+                    <SafeBgImage
+                        src={pkg.image}
                         className="absolute inset-0 bg-cover bg-center transition-transform duration-[900ms] group-hover:scale-110"
-                        style={{ backgroundImage: `url(${pkg.image})` }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
 
@@ -138,16 +138,7 @@ function TripCard({ pkg, index }) {
                         <b className="text-ink">{pkg.rating}</b> ({pkg.reviews})
                     </div>
 
-                    <div className="mt-4 flex items-end justify-between">
-                        {pkg.basePrice ? (
-                            <div>
-                                <div className="text-[10px] uppercase tracking-widest text-ink-muted font-bold">Starts from</div>
-                                <div className="font-display font-extrabold text-ink text-xl"
-                                    style={{ letterSpacing: '-0.02em' }}>
-                                    {inr(pkg.basePrice)}
-                                </div>
-                            </div>
-                        ) : <span />}
+                    <div className="mt-4 flex items-center justify-end">
                         <span className="inline-flex items-center gap-1 text-sm font-semibold text-brand-500 group-hover:gap-2 transition-all">
                             View <FiArrowRight />
                         </span>
