@@ -84,46 +84,50 @@ export default function Navbar() {
                 ${transparent
                     ? 'bg-transparent'
                     : 'bg-white/95 backdrop-blur-xl shadow-soft border-b border-ink-line/60'}`}>
-                <nav className="container-x flex items-center justify-between h-[80px] lg:h-[96px]">
+                <nav className="container-x flex items-center justify-between h-[68px] lg:h-[84px]">
                     <Link
                         to="/"
-                        className={`flex items-center gap-3 sm:gap-4 group transition-all duration-300 ${
+                        className={`flex items-center gap-3 sm:gap-3.5 group transition-all duration-300 ${
                             transparent
-                                ? 'bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-xl pl-2 pr-5 sm:pr-6 py-1.5 rounded-full shadow-2xl shadow-black/20'
+                                ? 'bg-white/10 hover:bg-white/15 border border-white/15 backdrop-blur-xl pl-1.5 pr-4 sm:pr-5 py-1 rounded-full shadow-xl shadow-black/20'
                                 : ''
                         }`}
                         aria-label={BRAND.name}
                     >
-                        {/* Animated glowing logo */}
+                        {/* Compact glowing logo */}
                         <span className="relative shrink-0">
-                            {/* Soft outer pulse halo — only when transparent over hero */}
                             {transparent && (
                                 <span aria-hidden className="absolute inset-0 rounded-full animate-pulse-ring" />
                             )}
-                            {/* Gradient ring frame */}
-                            <span className={`relative block rounded-full p-[2px] transition-all duration-300
+                            <span className={`relative block rounded-full p-[2px] transition-all duration-500
                                 ${transparent
-                                    ? 'bg-gradient-to-tr from-brand-500 via-amber-400 to-brand-500 shadow-[0_0_24px_rgba(255,122,0,0.45)]'
-                                    : 'bg-gradient-to-tr from-brand-500 to-amber-400 group-hover:shadow-brand'}`}>
-                                <span className={`block rounded-full p-[2px] ${transparent ? 'bg-ink/80' : 'bg-white'}`}>
+                                    ? 'bg-gradient-to-tr from-brand-500 via-amber-300 to-brand-500 shadow-[0_0_20px_rgba(255,122,0,0.5)]'
+                                    : 'bg-gradient-to-tr from-brand-500 via-amber-400 to-brand-500 group-hover:shadow-[0_6px_18px_rgba(255,122,0,0.3)]'}`}>
+                                <span className={`block rounded-full p-[1.5px] ${transparent ? 'bg-ink/80' : 'bg-white'}`}>
                                     <img
                                         src={BRAND.logo}
                                         alt={BRAND.name}
-                                        className="h-12 sm:h-14 lg:h-16 w-12 sm:w-14 lg:w-16 object-cover rounded-full transition-transform duration-500 group-hover:scale-105 group-hover:rotate-[6deg]"
+                                        className="h-10 sm:h-11 lg:h-14 w-10 sm:w-11 lg:w-14 object-cover rounded-full transition-transform duration-500 group-hover:scale-110 group-hover:rotate-[6deg]"
                                     />
                                 </span>
                             </span>
                         </span>
 
-                        {/* Brand wordmark + tagline */}
+                        {/* Brand wordmark + tagline — Playfair italic, decorative + compact */}
                         <span className="hidden sm:flex flex-col leading-none">
-                            <span className={`font-display font-extrabold text-[22px] lg:text-[26px] tracking-tight transition-colors
-                                ${transparent ? 'text-white' : 'text-ink'}`}
-                                style={{ letterSpacing: '-0.02em' }}>
-                                {BRAND.name}
+                            <span className="relative">
+                                <span className={`font-brand text-[24px] lg:text-[32px] tracking-normal transition-all duration-300 bg-clip-text text-transparent
+                                    ${transparent
+                                        ? 'bg-gradient-to-r from-white via-amber-100 to-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)]'
+                                        : 'bg-gradient-to-r from-brand-600 via-amber-500 to-brand-600 group-hover:from-brand-500 group-hover:via-amber-400 group-hover:to-brand-500'}`}
+                                    style={{ letterSpacing: '0.005em', lineHeight: 1.05, paddingBottom: '0.08em' }}>
+                                    {BRAND.name}
+                                </span>
+                                <span className={`absolute -right-2.5 top-0.5 w-1.5 h-1.5 rounded-full ${transparent ? 'bg-amber-300' : 'bg-brand-500'} animate-pulse`} />
                             </span>
-                            <span className={`mt-1 font-script text-[13px] lg:text-[15px] transition-colors
-                                ${transparent ? 'text-amber-300' : 'text-brand-500'}`}>
+                            <span className={`mt-1 flex items-center gap-1.5 font-script font-semibold text-[12px] lg:text-[14px] italic transition-all duration-300
+                                ${transparent ? 'text-amber-200' : 'text-brand-500'}`}>
+                                <span className={`block h-px w-3.5 ${transparent ? 'bg-amber-300/70' : 'bg-brand-400'} transition-all duration-500 group-hover:w-6`} />
                                 {BRAND.tagline}
                             </span>
                         </span>
@@ -192,7 +196,7 @@ export default function Navbar() {
                     {/* Invisible bridge — lets the mouse cross the gap without closing */}
                     <div className="h-3 -mt-3" aria-hidden="true" />
                     <div className="bg-white border-t border-ink-line shadow-float">
-                        <div className="container-x py-8 grid md:grid-cols-[1fr_1fr_260px] gap-10">
+                        <div className="container-x py-8 grid md:grid-cols-[1fr_1fr_260px] gap-10 items-stretch">
                             <MegaColumn
                                 title="Domestic Packages"
                                 icon={<FiMapPin />}
@@ -299,7 +303,7 @@ export default function Navbar() {
 function MegaColumn({ title, icon, regions, viewAllHref }) {
     const entries = Object.entries(regions);
     return (
-        <div>
+        <div className="flex flex-col h-full">
             <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-brand-500 font-bold mb-4">
                 <span className="w-7 h-7 rounded-lg bg-brand-50 text-brand-500 flex items-center justify-center">{icon}</span>
                 {title}
@@ -307,15 +311,18 @@ function MegaColumn({ title, icon, regions, viewAllHref }) {
             {entries.length === 0 ? (
                 <div className="text-sm text-ink-muted">No packages yet.</div>
             ) : (
-                <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                // Masonry-style multi-column layout — each region flows naturally without forcing equal row heights.
+                // `columns-2` with `break-inside-avoid` keeps each region intact while filling gaps.
+                <div className="columns-2 gap-x-6 [column-fill:_balance]">
                     {entries.map(([region, pkgs]) => (
-                        <div key={region}>
+                        <div key={region} className="break-inside-avoid mb-4 pb-1">
                             <div className="text-[11px] font-bold uppercase tracking-wider text-ink mb-2">{region}</div>
-                            <ul className="space-y-1.5">
+                            <ul className="space-y-1">
                                 {pkgs.slice(0, 5).map((p) => (
                                     <li key={p.slug}>
                                         <Link to={`/packages/${p.slug}`}
-                                            className="text-sm text-ink-muted hover:text-brand-500 hover:underline decoration-brand-300 underline-offset-2">
+                                            className="block truncate text-[13.5px] text-ink-muted hover:text-brand-500 hover:translate-x-0.5 transition-all"
+                                            title={p.title}>
                                             {p.title}
                                         </Link>
                                     </li>
@@ -326,7 +333,7 @@ function MegaColumn({ title, icon, regions, viewAllHref }) {
                 </div>
             )}
             <Link to={viewAllHref}
-                className="mt-5 inline-flex items-center gap-1.5 text-brand-500 font-semibold text-sm hover:gap-3 transition-all">
+                className="mt-auto pt-3 inline-flex items-center gap-1.5 text-brand-500 font-semibold text-sm hover:gap-3 transition-all">
                 View all <FiArrowRight />
             </Link>
         </div>

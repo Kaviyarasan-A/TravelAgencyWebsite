@@ -37,6 +37,8 @@ export default {
                 sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
                 display: ['"Plus Jakarta Sans"', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
                 script: ['"Dancing Script"', 'cursive'],
+                // `Lobster` for the brand wordmark (bold retro script — energetic, classic)
+                brand: ['Lobster', '"Dancing Script"', 'cursive'],
             },
             letterSpacing: {
                 'tight-x': '-0.02em',
