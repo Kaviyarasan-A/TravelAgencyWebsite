@@ -90,15 +90,46 @@ app.use((req, res, next) => {
     next();
 });
 
-/* ---------------- CORS ---------------- */
-const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:4173')
+/* ---------------- CORS ----------------
+ * Allowed origins come from CORS_ORIGIN (comma-separated). On top of that we
+ * always whitelist our own production domains and localhost dev ports so the
+ * site keeps working even if the env var is missing.
+ *
+ * Unknown origins are rejected with `cb(null, false)` rather than `cb(error)`.
+ * The browser still blocks the request (no Access-Control-Allow-Origin header
+ * is sent), but the server doesn't throw — preflights return 204 cleanly
+ * instead of 500, so the error handler logs stay quiet and nginx doesn't
+ * convert anything to a 502.
+ * --------------------------------------- */
+const DEFAULT_ORIGINS = [
+    'http://localhost:5173',
+    'http://localhost:4173',
+    'http://localhost:5174',
+    'http://localhost:3000',
+    'https://tripwithuz.com',
+    'https://www.tripwithuz.com',
+];
+const envOrigins = (process.env.CORS_ORIGIN || '')
     .split(',').map((s) => s.trim()).filter(Boolean);
+const allowedOrigins = [...new Set([...DEFAULT_ORIGINS, ...envOrigins])];
+
+// Allow any *.tripwithuz.com subdomain (preview deploys etc.) without needing
+// to list each one explicitly.
+function isAllowedOrigin(origin) {
+    if (!origin) return true; // server-to-server, curl, same-origin
+    if (allowedOrigins.includes(origin)) return true;
+    try {
+        const host = new URL(origin).hostname;
+        if (host === 'tripwithuz.com' || host.endsWith('.tripwithuz.com')) return true;
+    } catch { /* invalid origin header — fall through */ }
+    return false;
+}
 
 app.use(cors({
     origin: (origin, cb) => {
-        if (!origin) return cb(null, true);
-        if (allowedOrigins.includes(origin)) return cb(null, true);
-        return cb(new Error(`Origin ${origin} not allowed by CORS`));
+        if (isAllowedOrigin(origin)) return cb(null, true);
+        console.warn(`[cors] blocked origin: ${origin}`);
+        return cb(null, false);
     },
     credentials: true,
     exposedHeaders: ['X-Request-Id', 'Content-Disposition'],
