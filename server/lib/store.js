@@ -15,6 +15,7 @@
  */
 import crypto from 'node:crypto';
 import { MongoClient } from 'mongodb';
+import 'dotenv/config';
 
 const MONGODB_URI = process.env.MONGODB_URI || process.env.MONGO_URL || 'mongodb://localhost:27017';
 const MONGODB_DB  = process.env.MONGODB_DB  || 'tripwithuz';
