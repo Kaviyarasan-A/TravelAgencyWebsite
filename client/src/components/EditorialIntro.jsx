@@ -111,7 +111,7 @@ export default function EditorialIntro() {
                     {/* Big photo */}
                     <div className="absolute top-0 right-0 w-[72%] h-[64%] rounded-3xl overflow-hidden shadow-float ring-1 ring-black/5">
                         <div className="absolute inset-0 bg-cover bg-center transition-transform duration-[8000ms] hover:scale-105"
-                            style={{ backgroundImage: 'url(https://images.pexels.com/photos/2245436/pexels-photo-2245436.jpeg?auto=compress&cs=tinysrgb&w=1400)' }} />
+                            style={{ backgroundImage: 'url(https://images.pexels.com/photos/1018478/pexels-photo-1018478.jpeg?auto=compress&cs=tinysrgb&w=1400)' }} />
                         <div className="absolute top-4 left-4 inline-flex items-center gap-1.5 bg-white/95 backdrop-blur px-3 py-1.5 rounded-full text-[11px] font-semibold text-ink shadow">
                             <FiMapPin className="text-brand-500" size={11} /> Santorini, GR
                         </div>

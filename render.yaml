@@ -16,10 +16,9 @@ services:
     plan: free                      # Free tier. Limitations:
                                     #  - Server sleeps after 15 min idle.
                                     #    First request after sleep = ~30s delay.
-                                    #  - No persistent disk → server/db/*.json
-                                    #    resets on every deploy/restart.
-                                    # Upgrade to 'starter' ($7/mo) later when
-                                    # the business needs always-on + data persistence.
+                                    #  - Data is now in MongoDB Atlas, so the
+                                    #    free tier is safe for production — the
+                                    #    container disk no longer holds db state.
     region: singapore               # Closest to India — lowest latency.
     branch: main
     buildCommand: npm install
@@ -27,17 +26,16 @@ services:
     healthCheckPath: /api/health
     autoDeploy: true                # Auto-redeploy on every push to main.
 
-    # NOTE: no persistent disk on free tier (Render doesn't allow it).
-    # The JSON files in server/db/ will reset when the container restarts.
-    # Emails still fire for every booking, so the actual bookings aren't
-    # lost — they're in your Gmail inbox.
-    # Uncomment this block + switch plan to 'starter' to enable persistence:
-    # disk:
-    #   name: db
-    #   mountPath: /opt/render/project/src/server/db
-    #   sizeGB: 1
+    # Data persistence: handled by MongoDB Atlas (set MONGODB_URI below).
+    # No Render disk needed.
 
     envVars:
+      # ---- MongoDB ----
+      - key: MONGODB_URI
+        sync: false                 # YOU set this in dashboard — Atlas connection string
+      - key: MONGODB_DB
+        value: tripwithuz
+
       # ---- Runtime ----
       - key: NODE_ENV
         value: production

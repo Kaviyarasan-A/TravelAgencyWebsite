@@ -145,6 +145,13 @@ export const api = {
     adminSeasons:        ()           => getAuth('/api/admin/seasons'),
     adminUpdateSeasons:  (data)       => postAuth('/api/admin/seasons', data),
 
+    // admin — users (super-admin only for mutations)
+    adminUsers:          ()           => getAuth('/api/admin/users'),
+    adminUsersMeta:      ()           => getAuth('/api/admin/users/_meta'),
+    adminCreateUser:     (data)       => postAuth('/api/admin/users', data),
+    adminUpdateUser:     (id, patch)  => patchAuth(`/api/admin/users/${id}`, patch),
+    adminDeleteUser:     (id)         => delAuth(`/api/admin/users/${id}`),
+
     // returns the full URL (with auth header) for the caller to trigger a browser download
     adminEnquiriesCsvUrl: () => `${BASE}/api/admin/enquiries.csv`,
     adminBackupUrl:       () => `${BASE}/api/admin/backup`,

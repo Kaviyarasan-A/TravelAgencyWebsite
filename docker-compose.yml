@@ -7,10 +7,23 @@
 #   3. Client on http://localhost, API on http://localhost:5000
 #
 # DB persistence:
-#   The `server_db` named volume stores server/db/*.json.
-#   Your bookings, blogs, packages and ads survive container rebuilds.
+#   Data lives in the `mongo` service backed by the `mongo_data` volume.
+#   Bookings, blogs, packages, ads, users etc. survive container rebuilds.
+#   For production you can point MONGODB_URI to MongoDB Atlas instead and
+#   drop the local `mongo` service.
 
 services:
+  mongo:
+    image: mongo:7
+    container_name: tripwithuz-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - tripwithuz
+
   server:
     build:
       context: ./server
@@ -21,10 +34,14 @@ services:
     environment:
       NODE_ENV: production
       PORT: 5000
+      # Override .env so the server reaches the mongo service inside the
+      # docker network rather than localhost.
+      MONGODB_URI: mongodb://mongo:27017
+      MONGODB_DB: tripwithuz
     ports:
       - "5000:5000"
-    volumes:
-      - server_db:/app/db
+    depends_on:
+      - mongo
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:5000/api/health"]
       interval: 30s
@@ -52,7 +69,7 @@ services:
       - tripwithuz
 
 volumes:
-  server_db:
+  mongo_data:
 
 networks:
   tripwithuz:

@@ -13,10 +13,7 @@ RUN npm ci --omit=dev && npm cache clean --force
 # Copy the rest of the server source.
 COPY --chown=app:app . .
 
-# `db/` is a mounted volume — declare it so container deletion doesn't wipe data.
-# If you don't mount a volume, data still persists *inside* the container but is
-# lost on `docker rm`.
-VOLUME ["/app/db"]
+# Data now lives in MongoDB — no on-disk database to persist.
 
 USER app
 ENV NODE_ENV=production

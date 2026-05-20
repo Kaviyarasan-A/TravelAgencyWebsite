@@ -1,132 +1,163 @@
 /**
- * Tiny atomic JSON file store — good enough for a single-process Node
- * server. Each collection is an array of records serialized to disk.
+ * MongoDB-backed store. Replaces the previous JSON-file store with a real
+ * database while keeping the exact same exported API so server.js does not
+ * need to change.
  *
- * Operations are serialized with an in-memory mutex so concurrent API
- * requests don't corrupt the file. Writes go to a .tmp file and are
- * renamed into place to avoid half-written JSON.
+ * Collections used: admin, ads, blogs, bookings, destinations, enquiries,
+ * packages, seasons, users.
+ *
+ * IDs are kept as short string IDs (base64url, 9 random bytes) rather than
+ * Mongo ObjectIds so existing slugs/links and any frontend code that holds
+ * onto an `id` field continue to work unchanged.
+ *
+ * Single-document collections (currently only `seasons`) live as a single
+ * document with a fixed _id of "config".
  */
-import fs from 'node:fs/promises';
-import path from 'node:path';
 import crypto from 'node:crypto';
-import { fileURLToPath } from 'node:url';
+import { MongoClient } from 'mongodb';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DB_DIR = path.join(__dirname, '..', 'db');
+const MONGODB_URI = process.env.MONGODB_URI || process.env.MONGO_URL || 'mongodb://localhost:27017';
+const MONGODB_DB  = process.env.MONGODB_DB  || 'tripwithuz';
 
-async function ensureDir() {
-    await fs.mkdir(DB_DIR, { recursive: true });
+let client = null;
+let db = null;
+let connecting = null;
+
+async function connect() {
+    if (db) return db;
+    if (connecting) return connecting;
+    connecting = (async () => {
+        client = new MongoClient(MONGODB_URI, {
+            serverSelectionTimeoutMS: 8000,
+            maxPoolSize: 10,
+        });
+        await client.connect();
+        db = client.db(MONGODB_DB);
+        console.log(`[mongo] connected to ${MONGODB_DB}`);
+        return db;
+    })();
+    return connecting;
 }
 
-function filePath(name) {
-    return path.join(DB_DIR, `${name}.json`);
+/**
+ * Eagerly establish the connection at boot. Called from server.js so a bad
+ * connection string fails fast rather than on the first request.
+ */
+export async function init() {
+    await connect();
+    // Ensure helpful indexes. These are idempotent — Mongo skips ones that exist.
+    const tasks = [
+        db.collection('packages').createIndex({ slug: 1 }, { unique: false }),
+        db.collection('blogs').createIndex({ slug: 1 }, { unique: false }),
+        db.collection('destinations').createIndex({ slug: 1 }, { unique: false }),
+        db.collection('enquiries').createIndex({ createdAt: -1 }),
+        db.collection('bookings').createIndex({ createdAt: -1 }),
+        db.collection('users').createIndex({ username: 1 }, { unique: true }),
+    ];
+    await Promise.allSettled(tasks);
 }
 
-const locks = new Map();
-function withLock(name, fn) {
-    const prev = locks.get(name) || Promise.resolve();
-    const next = prev.then(fn, fn);
-    locks.set(
-        name,
-        next.catch(() => {}),
-    );
-    return next;
+export async function close() {
+    if (client) await client.close();
+    client = null; db = null; connecting = null;
 }
 
-async function readRaw(name, fallback = []) {
-    await ensureDir();
-    try {
-        const txt = await fs.readFile(filePath(name), 'utf8');
-        return JSON.parse(txt);
-    } catch (err) {
-        if (err.code === 'ENOENT') return fallback;
-        throw err;
-    }
-}
-
-async function writeRaw(name, data) {
-    await ensureDir();
-    const target = filePath(name);
-    const tmp = `${target}.tmp`;
-    await fs.writeFile(tmp, JSON.stringify(data, null, 2), 'utf8');
-    await fs.rename(tmp, target);
+function col(name) {
+    if (!db) throw new Error('[mongo] store used before init() resolved');
+    return db.collection(name);
 }
 
 export function newId() {
     return crypto.randomBytes(9).toString('base64url');
 }
 
+/** Drop Mongo's internal _id field from results so payloads stay clean. */
+function strip(doc) {
+    if (!doc || typeof doc !== 'object') return doc;
+    // eslint-disable-next-line no-unused-vars
+    const { _id, ...rest } = doc;
+    return rest;
+}
+
+/* ---------------- Collection API (arrays of records) ---------------- */
+
 export async function list(name) {
-    return withLock(name, () => readRaw(name, []));
+    // Newest-first matches the old in-memory `unshift` ordering so the
+    // dashboard activity feed keeps showing the most recent entries.
+    const rows = await col(name).find({}).sort({ createdAt: -1 }).toArray();
+    return rows.map(strip);
 }
 
 export async function get(name, id) {
-    const all = await list(name);
-    return all.find((r) => r.id === id) || null;
+    const row = await col(name).findOne({ id });
+    return row ? strip(row) : null;
 }
 
 export async function insert(name, record) {
-    return withLock(name, async () => {
-        const all = await readRaw(name, []);
-        const row = { id: record.id || newId(), createdAt: record.createdAt || new Date().toISOString(), ...record };
-        all.unshift(row);
-        await writeRaw(name, all);
-        return row;
-    });
+    const row = {
+        id: record.id || newId(),
+        createdAt: record.createdAt || new Date().toISOString(),
+        ...record,
+    };
+    // Make sure the caller-supplied id/createdAt always win over the defaults
+    // when explicitly provided, which is the behaviour spread above already
+    // gives — preserved here for clarity.
+    await col(name).insertOne(row);
+    return strip(row);
 }
 
 export async function update(name, id, patch) {
-    return withLock(name, async () => {
-        const all = await readRaw(name, []);
-        const i = all.findIndex((r) => r.id === id);
-        if (i === -1) return null;
-        all[i] = { ...all[i], ...patch, id: all[i].id, updatedAt: new Date().toISOString() };
-        await writeRaw(name, all);
-        return all[i];
-    });
+    const set = { ...patch, id, updatedAt: new Date().toISOString() };
+    const res = await col(name).findOneAndUpdate(
+        { id },
+        { $set: set },
+        { returnDocument: 'after' },
+    );
+    // Mongo driver v6 returns the document directly; older return shape is { value }.
+    const doc = res && res.value !== undefined ? res.value : res;
+    return doc ? strip(doc) : null;
 }
 
 export async function remove(name, id) {
-    return withLock(name, async () => {
-        const all = await readRaw(name, []);
-        const next = all.filter((r) => r.id !== id);
-        if (next.length === all.length) return false;
-        await writeRaw(name, next);
-        return true;
-    });
+    const res = await col(name).deleteOne({ id });
+    return res.deletedCount > 0;
 }
 
 export async function seedIfEmpty(name, rows) {
-    return withLock(name, async () => {
-        const all = await readRaw(name, null);
-        if (Array.isArray(all) && all.length > 0) return all;
-        const seeded = rows.map((r) => ({
-            id: r.id || newId(),
-            createdAt: new Date().toISOString(),
-            ...r,
-        }));
-        await writeRaw(name, seeded);
-        return seeded;
-    });
+    const count = await col(name).estimatedDocumentCount();
+    if (count > 0) {
+        return (await col(name).find({}).sort({ createdAt: -1 }).toArray()).map(strip);
+    }
+    if (!Array.isArray(rows) || rows.length === 0) return [];
+    const seeded = rows.map((r) => ({
+        id: r.id || newId(),
+        createdAt: r.createdAt || new Date().toISOString(),
+        ...r,
+    }));
+    await col(name).insertMany(seeded);
+    return seeded.map(strip);
 }
 
-/* -----------------------------------------------------------------
- * Single-document helpers — same on-disk format as collections, but
- * the file holds one object instead of an array. Used for app-wide
- * config (seasonal content, feature flags, etc).
- * ----------------------------------------------------------------- */
+/* ---------------- Single-document helpers ----------------
+ * Single-doc collections (currently `seasons`) keep one document with a
+ * fixed _id of "config". Same external semantics as before.
+ * --------------------------------------------------------- */
+const SINGLE_DOC_ID = 'config';
+
 export async function getDoc(name, fallback = {}) {
-    return withLock(name, async () => {
-        const data = await readRaw(name, null);
-        if (data && !Array.isArray(data) && typeof data === 'object') return data;
-        return fallback;
-    });
+    const doc = await col(name).findOne({ _id: SINGLE_DOC_ID });
+    if (!doc) return fallback;
+    // eslint-disable-next-line no-unused-vars
+    const { _id, ...rest } = doc;
+    return rest;
 }
 
 export async function setDoc(name, data) {
-    return withLock(name, async () => {
-        const next = { ...data, updatedAt: new Date().toISOString() };
-        await writeRaw(name, next);
-        return next;
-    });
+    const next = { ...data, updatedAt: new Date().toISOString() };
+    await col(name).updateOne(
+        { _id: SINGLE_DOC_ID },
+        { $set: next },
+        { upsert: true },
+    );
+    return next;
 }

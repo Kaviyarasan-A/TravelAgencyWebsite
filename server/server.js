@@ -31,8 +31,8 @@ import nodemailer from 'nodemailer';
 import crypto from 'node:crypto';
 
 import * as store from './lib/store.js';
-import { issueToken, adminOnly } from './lib/auth.js';
-import { verifyAdminCredentials, changeAdminPassword, getAdminCredentials } from './lib/adminStore.js';
+import { issueToken, adminOnly, requirePerm, requireSuper } from './lib/auth.js';
+import * as users from './lib/usersStore.js';
 import { buildMessage, waLink, sendViaCloudApi } from './lib/whatsapp.js';
 import { SEED_PACKAGES } from './lib/seedPackages.js';
 import { SEED_BLOGS } from './lib/seedBlogs.js';
@@ -639,29 +639,95 @@ app.post('/api/bookings/:id/paid', formLimiter, async (req, res) => {
 });
 
 /* ---------------- Admin auth ---------------- */
+function userForClient(u) {
+    if (!u) return null;
+    return {
+        id: u.id,
+        username: u.username,
+        displayName: u.displayName || u.username,
+        isSuper: !!u.isSuper,
+        active: u.active !== false,
+        permissions: u.isSuper ? users.fullPermissions() : (u.permissions || users.emptyPermissions()),
+    };
+}
+
 app.post('/api/admin/login', loginLimiter, async (req, res) => {
     const { username, password } = req.body || {};
-    if (!(await verifyAdminCredentials(username, password))) {
-        return res.status(401).json({ ok: false, error: 'invalid_credentials' });
-    }
-    const token = issueToken(username);
-    res.json({ ok: true, token, user: { username }, expiresInMs: 12 * 60 * 60 * 1000 });
+    const user = await users.verifyCredentials(username, password);
+    if (!user) return res.status(401).json({ ok: false, error: 'invalid_credentials' });
+    const token = issueToken(user);
+    res.json({
+        ok: true,
+        token,
+        user: userForClient(user),
+        expiresInMs: 12 * 60 * 60 * 1000,
+    });
 });
 
 app.get('/api/admin/me', adminOnly, async (req, res) => {
-    const creds = await getAdminCredentials();
     res.json({
         ok: true,
-        user: { username: req.admin.sub, displayName: creds.username },
-        issuedAt: req.admin.iat, expiresAt: req.admin.exp,
+        user: userForClient(req.user),
+        issuedAt: req.admin.iat,
+        expiresAt: req.admin.exp,
     });
 });
 
 app.post('/api/admin/change-password', adminOnly, async (req, res) => {
     const { currentPassword, newPassword } = req.body || {};
-    const result = await changeAdminPassword(req.admin.sub, currentPassword, newPassword);
+    const result = await users.changePassword(req.user.id, currentPassword, newPassword);
     if (!result.ok) return res.status(400).json(result);
     res.json(result);
+});
+
+/* ---------------- Admin users (super-admin only) ----------------
+ * Listing requires any admin (so non-supers can at least see who else is
+ * around when looking at audit context). Create/edit/delete require
+ * super-admin status — enforced via requireSuper middleware.
+ * ----------------------------------------------------------------- */
+app.get('/api/admin/users', adminOnly, async (_req, res) => {
+    const list = await users.listUsers();
+    res.json({ ok: true, users: list.map((u) => ({
+        id: u.id,
+        username: u.username,
+        displayName: u.displayName || u.username,
+        isSuper: !!u.isSuper,
+        active: u.active !== false,
+        permissions: u.isSuper ? users.fullPermissions() : (u.permissions || users.emptyPermissions()),
+        createdAt: u.createdAt,
+        updatedAt: u.updatedAt,
+    })) });
+});
+
+app.get('/api/admin/users/_meta', adminOnly, (_req, res) => {
+    // Exposes the canonical module list + levels so the UI doesn't hardcode them.
+    res.json({ ok: true, modules: users.MODULES, levels: users.LEVELS });
+});
+
+app.post('/api/admin/users', adminOnly, requireSuper, async (req, res) => {
+    const result = await users.createUser(req.body || {});
+    if (!result.ok) return res.status(400).json(result);
+    res.json({ ok: true, user: result.user });
+});
+
+app.patch('/api/admin/users/:id', adminOnly, requireSuper, async (req, res) => {
+    // Prevent a super-admin from deactivating their own account and locking
+    // themselves out. They can still demote / deactivate others.
+    if (req.params.id === req.user.id && req.body && req.body.active === false) {
+        return res.status(400).json({ ok: false, error: 'cannot_deactivate_self' });
+    }
+    const result = await users.updateUser(req.params.id, req.body || {});
+    if (!result.ok) return res.status(400).json(result);
+    res.json({ ok: true, user: result.user });
+});
+
+app.delete('/api/admin/users/:id', adminOnly, requireSuper, async (req, res) => {
+    if (req.params.id === req.user.id) {
+        return res.status(400).json({ ok: false, error: 'cannot_delete_self' });
+    }
+    const result = await users.deleteUser(req.params.id);
+    if (!result.ok) return res.status(400).json(result);
+    res.json({ ok: true });
 });
 
 /* ---------------- Admin enquiries ---------------- */
@@ -679,7 +745,7 @@ function filterEnquiries(all, { status, type, q }) {
     return out;
 }
 
-app.get('/api/admin/enquiries', adminOnly, async (req, res) => {
+app.get('/api/admin/enquiries', adminOnly, requirePerm('enquiries', 'read'), async (req, res) => {
     const all = await store.list('enquiries');
     res.json({ ok: true, enquiries: filterEnquiries(all, req.query) });
 });
@@ -691,7 +757,7 @@ function csvEscape(v) {
     return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
-app.get('/api/admin/enquiries.csv', adminOnly, async (req, res) => {
+app.get('/api/admin/enquiries.csv', adminOnly, requirePerm('enquiries', 'read'), async (req, res) => {
     const all = await store.list('enquiries');
     const rows = filterEnquiries(all, req.query);
     const header = CSV_COLS.join(',');
@@ -707,7 +773,7 @@ app.get('/api/admin/enquiries.csv', adminOnly, async (req, res) => {
     res.send(body);
 });
 
-app.patch('/api/admin/enquiries/:id', adminOnly, async (req, res) => {
+app.patch('/api/admin/enquiries/:id', adminOnly, requirePerm('enquiries', 'write'), async (req, res) => {
     const { status, notes } = req.body || {};
     const patch = {};
     if (status) patch.status = status;
@@ -717,7 +783,7 @@ app.patch('/api/admin/enquiries/:id', adminOnly, async (req, res) => {
     res.json({ ok: true, enquiry: row });
 });
 
-app.delete('/api/admin/enquiries/:id', adminOnly, async (req, res) => {
+app.delete('/api/admin/enquiries/:id', adminOnly, requirePerm('enquiries', 'write'), async (req, res) => {
     const ok = await store.remove('enquiries', req.params.id);
     if (!ok) return res.status(404).json({ ok: false, error: 'not_found' });
     res.json({ ok: true });
@@ -792,12 +858,12 @@ function validatePackage(body) {
     return null;
 }
 
-app.get('/api/admin/packages', adminOnly, async (_req, res) => {
+app.get('/api/admin/packages', adminOnly, requirePerm('packages', 'read'), async (_req, res) => {
     const all = await store.list('packages');
     res.json({ ok: true, packages: all });
 });
 
-app.post('/api/admin/packages', adminOnly, async (req, res) => {
+app.post('/api/admin/packages', adminOnly, requirePerm('packages', 'write'), async (req, res) => {
     const err = validatePackage(req.body);
     if (err) return res.status(400).json({ ok: false, error: err });
     const existing = await store.list('packages');
@@ -812,7 +878,7 @@ app.post('/api/admin/packages', adminOnly, async (req, res) => {
     res.json({ ok: true, package: row });
 });
 
-app.patch('/api/admin/packages/:id', adminOnly, async (req, res) => {
+app.patch('/api/admin/packages/:id', adminOnly, requirePerm('packages', 'write'), async (req, res) => {
     if (req.body.slug && !/^[a-z0-9-]+$/.test(req.body.slug)) {
         return res.status(400).json({ ok: false, error: 'slug_invalid_format' });
     }
@@ -827,44 +893,44 @@ app.patch('/api/admin/packages/:id', adminOnly, async (req, res) => {
     res.json({ ok: true, package: row });
 });
 
-app.delete('/api/admin/packages/:id', adminOnly, async (req, res) => {
+app.delete('/api/admin/packages/:id', adminOnly, requirePerm('packages', 'write'), async (req, res) => {
     const ok = await store.remove('packages', req.params.id);
     if (!ok) return res.status(404).json({ ok: false, error: 'not_found' });
     res.json({ ok: true });
 });
 
 /* ---------------- Admin ads ---------------- */
-app.get('/api/admin/ads', adminOnly, async (_req, res) => {
+app.get('/api/admin/ads', adminOnly, requirePerm('ads', 'read'), async (_req, res) => {
     const all = await store.list('ads');
     res.json({ ok: true, ads: all });
 });
 
-app.post('/api/admin/ads', adminOnly, async (req, res) => {
+app.post('/api/admin/ads', adminOnly, requirePerm('ads', 'write'), async (req, res) => {
     const { title, placement } = req.body || {};
     if (!title || !placement) return res.status(400).json({ ok: false, error: 'title_and_placement_required' });
     const row = await store.insert('ads', { active: true, priority: 5, ...req.body });
     res.json({ ok: true, ad: row });
 });
 
-app.patch('/api/admin/ads/:id', adminOnly, async (req, res) => {
+app.patch('/api/admin/ads/:id', adminOnly, requirePerm('ads', 'write'), async (req, res) => {
     const row = await store.update('ads', req.params.id, req.body);
     if (!row) return res.status(404).json({ ok: false, error: 'not_found' });
     res.json({ ok: true, ad: row });
 });
 
-app.delete('/api/admin/ads/:id', adminOnly, async (req, res) => {
+app.delete('/api/admin/ads/:id', adminOnly, requirePerm('ads', 'write'), async (req, res) => {
     const ok = await store.remove('ads', req.params.id);
     if (!ok) return res.status(404).json({ ok: false, error: 'not_found' });
     res.json({ ok: true });
 });
 
 /* ---------------- Admin seasons ---------------- */
-app.get('/api/admin/seasons', adminOnly, async (_req, res) => {
+app.get('/api/admin/seasons', adminOnly, requirePerm('seasons', 'read'), async (_req, res) => {
     const cfg = await readSeasonsConfig();
     res.json({ ok: true, config: { ...cfg, detected: detectSeason() } });
 });
 
-app.post('/api/admin/seasons', adminOnly, async (req, res) => {
+app.post('/api/admin/seasons', adminOnly, requirePerm('seasons', 'write'), async (req, res) => {
     try {
         const incoming = req.body || {};
         const mode = incoming.mode === 'override' ? 'override' : 'auto';
@@ -919,12 +985,12 @@ function slugify(s) {
     return String(s || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
-app.get('/api/admin/blogs', adminOnly, async (_req, res) => {
+app.get('/api/admin/blogs', adminOnly, requirePerm('blogs', 'read'), async (_req, res) => {
     const all = await store.list('blogs');
     res.json({ ok: true, blogs: all });
 });
 
-app.post('/api/admin/blogs', adminOnly, async (req, res) => {
+app.post('/api/admin/blogs', adminOnly, requirePerm('blogs', 'write'), async (req, res) => {
     const { title } = req.body || {};
     if (!title) return res.status(400).json({ ok: false, error: 'title_required' });
     const slug = req.body.slug ? slugify(req.body.slug) : slugify(title);
@@ -940,7 +1006,7 @@ app.post('/api/admin/blogs', adminOnly, async (req, res) => {
     res.json({ ok: true, blog: row });
 });
 
-app.patch('/api/admin/blogs/:id', adminOnly, async (req, res) => {
+app.patch('/api/admin/blogs/:id', adminOnly, requirePerm('blogs', 'write'), async (req, res) => {
     const patch = { ...req.body };
     if (patch.slug) {
         patch.slug = slugify(patch.slug);
@@ -954,34 +1020,34 @@ app.patch('/api/admin/blogs/:id', adminOnly, async (req, res) => {
     res.json({ ok: true, blog: row });
 });
 
-app.delete('/api/admin/blogs/:id', adminOnly, async (req, res) => {
+app.delete('/api/admin/blogs/:id', adminOnly, requirePerm('blogs', 'write'), async (req, res) => {
     const ok = await store.remove('blogs', req.params.id);
     if (!ok) return res.status(404).json({ ok: false, error: 'not_found' });
     res.json({ ok: true });
 });
 
 /* ---------------- Admin bookings ---------------- */
-app.get('/api/admin/bookings', adminOnly, async (req, res) => {
+app.get('/api/admin/bookings', adminOnly, requirePerm('bookings', 'read'), async (req, res) => {
     const all = await store.list('bookings');
     const { status } = req.query;
     const out = status ? all.filter((b) => b.status === status) : all;
     res.json({ ok: true, bookings: out });
 });
 
-app.patch('/api/admin/bookings/:id', adminOnly, async (req, res) => {
+app.patch('/api/admin/bookings/:id', adminOnly, requirePerm('bookings', 'write'), async (req, res) => {
     const row = await store.update('bookings', req.params.id, req.body);
     if (!row) return res.status(404).json({ ok: false, error: 'not_found' });
     res.json({ ok: true, booking: row });
 });
 
-app.delete('/api/admin/bookings/:id', adminOnly, async (req, res) => {
+app.delete('/api/admin/bookings/:id', adminOnly, requirePerm('bookings', 'write'), async (req, res) => {
     const ok = await store.remove('bookings', req.params.id);
     if (!ok) return res.status(404).json({ ok: false, error: 'not_found' });
     res.json({ ok: true });
 });
 
 /* ---------------- Backup ---------------- */
-app.get('/api/admin/backup', adminOnly, async (_req, res) => {
+app.get('/api/admin/backup', adminOnly, requireSuper, async (_req, res) => {
     const [enquiries, packages, bookings, blogs, ads] = await Promise.all([
         store.list('enquiries'),
         store.list('packages'),
@@ -1097,6 +1163,14 @@ app.use((err, _req, res, _next) => {
 
 /* ---------------- Start + graceful shutdown ---------------- */
 (async () => {
+    try {
+        await store.init();
+    } catch (e) {
+        console.error('[mongo] connection failed — server cannot start:', e.message);
+        console.error('[mongo] check MONGODB_URI in your .env file');
+        process.exit(1);
+    }
+
     await store.seedIfEmpty('packages', SEED_PACKAGES);
     await store.seedIfEmpty('enquiries', []);
     await store.seedIfEmpty('admin', []);
@@ -1104,6 +1178,10 @@ app.use((err, _req, res, _next) => {
     await store.seedIfEmpty('blogs', SEED_BLOGS);
     await store.seedIfEmpty('bookings', []);
     await store.seedIfEmpty('destinations', SEED_DESTINATIONS);
+
+    // Seed a super-admin from ADMIN_USER/ADMIN_PASS env on first ever boot
+    // (no-op afterwards). Without this nobody can sign in to /admin.
+    await users.bootstrapSuperAdmin();
 
     // Migration — backfill `places` array on existing destination rows from
     // the seed, so older saves get the new tourist-spots data without a wipe.
@@ -1212,9 +1290,10 @@ app.use((err, _req, res, _next) => {
 
     const shutdown = (signal) => () => {
         console.log(`\n[server] ${signal} received — shutting down gracefully.`);
-        httpServer.close((err) => {
+        httpServer.close(async (err) => {
             if (err) { console.error('[server] close error:', err); process.exit(1); }
             console.log('[server] HTTP server closed.');
+            try { await store.close(); } catch {}
             process.exit(0);
         });
         // Force exit after 10s in case open connections hang.

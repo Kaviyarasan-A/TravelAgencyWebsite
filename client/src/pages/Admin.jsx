@@ -146,40 +146,71 @@ function LoginForm({ onAuthed }) {
  * Shell with sidebar
  * ========================================================================= */
 
-// Nav grouped into sections — labels only render when sidebar is expanded
+// Nav grouped into sections — labels only render when sidebar is expanded.
+// `module` maps the nav item to a permission module so the sidebar can hide
+// entries the signed-in user has no access to.
 const NAV_GROUPS = [
     {
         section: 'Overview',
         items: [
-            { id: 'dashboard', label: 'Dashboard',  icon: <FiBarChart2 />, hint: 'Stats & activity' },
+            { id: 'dashboard', label: 'Dashboard',  icon: <FiBarChart2 />, hint: 'Stats & activity', module: null },
         ],
     },
     {
         section: 'Operations',
         items: [
-            { id: 'enquiries', label: 'Enquiries',  icon: <FiInbox />,      hint: 'Leads · contact form' },
-            { id: 'bookings',  label: 'Bookings',   icon: <FiCreditCard />, hint: 'Quotations & UPI payments' },
+            { id: 'enquiries', label: 'Enquiries',  icon: <FiInbox />,      hint: 'Leads · contact form',       module: 'enquiries' },
+            { id: 'bookings',  label: 'Bookings',   icon: <FiCreditCard />, hint: 'Quotations & UPI payments', module: 'bookings' },
         ],
     },
     {
         section: 'Content',
         items: [
-            { id: 'packages',  label: 'Packages',   icon: <FiPackage />,  hint: 'Tour packages' },
-            { id: 'seasons',   label: 'Seasons',    icon: <FiSun />,      hint: 'Seasonal home content' },
-            { id: 'ads',       label: 'Ads / Promo',icon: <FiImage />,    hint: 'Hero & inline banners' },
-            { id: 'blogs',     label: 'Blog Posts', icon: <FiFileText />, hint: 'SEO articles' },
+            { id: 'packages',  label: 'Packages',   icon: <FiPackage />,  hint: 'Tour packages',          module: 'packages' },
+            { id: 'seasons',   label: 'Seasons',    icon: <FiSun />,      hint: 'Seasonal home content',  module: 'seasons' },
+            { id: 'ads',       label: 'Ads / Promo',icon: <FiImage />,    hint: 'Hero & inline banners',  module: 'ads' },
+            { id: 'blogs',     label: 'Blog Posts', icon: <FiFileText />, hint: 'SEO articles',            module: 'blogs' },
         ],
     },
     {
         section: 'System',
         items: [
-            { id: 'settings',  label: 'Settings',   icon: <FiSettings />, hint: 'Profile & security' },
+            { id: 'settings',  label: 'Settings',   icon: <FiSettings />, hint: 'Profile · users · security', module: null },
         ],
     },
 ];
 
 // Flat lookup helper used by header / breadcrumb
 const NAV = NAV_GROUPS.flatMap((g) => g.items);
+
+/**
+ * Filter the nav for the signed-in user. Items with `module: null` (dashboard,
+ * settings) are always visible. Super-admins see everything. Everyone else
+ * only sees items whose module is at least 'read' in their permissions.
+ */
+function visibleNav(user) {
+    if (!user) return NAV_GROUPS;
+    if (user.isSuper) return NAV_GROUPS;
+    const perms = user.permissions || {};
+    return NAV_GROUPS
+        .map((g) => ({
+            ...g,
+            items: g.items.filter((i) => {
+                if (!i.module) return true;
+                const lvl = perms[i.module];
+                return lvl === 'read' || lvl === 'write';
+            }),
+        }))
+        .filter((g) => g.items.length > 0);
+}
+
+function canAccess(user, module) {
+    if (!user) return false;
+    if (user.isSuper) return true;
+    if (!module) return true;
+    const lvl = (user.permissions || {})[module];
+    return lvl === 'read' || lvl === 'write';
+}
 
 function AdminShell({ user, onLogout }) {
     const [tab, setTab] = useState('dashboard');
@@ -188,8 +219,19 @@ function AdminShell({ user, onLogout }) {
 
     useEffect(() => { setMobileOpen(false); }, [tab]);
 
-    const current = NAV.find((n) => n.id === tab);
-    const currentGroup = NAV_GROUPS.find((g) => g.items.some((i) => i.id === tab));
+    const navGroups = useMemo(() => visibleNav(user), [user]);
+    const flatNav = useMemo(() => navGroups.flatMap((g) => g.items), [navGroups]);
+
+    // If the current tab gets hidden by a permission change, fall back to the
+    // first visible item (dashboard for normal users, settings if nothing else).
+    useEffect(() => {
+        if (!flatNav.find((n) => n.id === tab)) {
+            setTab(flatNav[0]?.id || 'settings');
+        }
+    }, [flatNav, tab]);
+
+    const current = flatNav.find((n) => n.id === tab) || NAV.find((n) => n.id === tab);
+    const currentGroup = navGroups.find((g) => g.items.some((i) => i.id === tab));
     const showText = expanded || mobileOpen;
 
     return (
@@ -225,7 +267,7 @@ function AdminShell({ user, onLogout }) {
 
                 {/* Nav */}
                 <nav className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-2.5 space-y-5 no-scrollbar">
-                    {NAV_GROUPS.map((g) => (
+                    {navGroups.map((g) => (
                         <div key={g.section}>
                             <div className={`px-3 mb-2 text-[10px] font-bold uppercase tracking-[2.5px] text-slate-500 transition-opacity duration-200 ${showText ? 'opacity-100' : 'opacity-0 h-0 m-0'}`}>
                                 {g.section}
@@ -341,12 +383,12 @@ function AdminShell({ user, onLogout }) {
                             transition={{ duration: 0.2 }}
                         >
                             {tab === 'dashboard' && <DashboardPanel onNav={setTab} />}
-                            {tab === 'enquiries' && <EnquiriesPanel />}
-                            {tab === 'bookings'  && <BookingsPanel />}
-                            {tab === 'packages'  && <PackagesPanel />}
-                            {tab === 'seasons'   && <SeasonsPanel />}
-                            {tab === 'ads'       && <AdsPanel />}
-                            {tab === 'blogs'     && <BlogsPanel />}
+                            {tab === 'enquiries' && canAccess(user, 'enquiries') && <EnquiriesPanel />}
+                            {tab === 'bookings'  && canAccess(user, 'bookings')  && <BookingsPanel />}
+                            {tab === 'packages'  && canAccess(user, 'packages')  && <PackagesPanel />}
+                            {tab === 'seasons'   && canAccess(user, 'seasons')   && <SeasonsPanel />}
+                            {tab === 'ads'       && canAccess(user, 'ads')       && <AdsPanel />}
+                            {tab === 'blogs'     && canAccess(user, 'blogs')     && <BlogsPanel />}
                             {tab === 'settings'  && <SettingsPanel user={user} />}
                         </motion.div>
                     </AnimatePresence>
@@ -1209,13 +1251,16 @@ function SettingsPanel({ user }) {
     };
 
     return (
-        <div className="space-y-4 max-w-3xl">
+        <div className="space-y-4 max-w-4xl">
             <div className="bg-white rounded-2xl p-6 shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center"><FiShield /></div>
                     <div>
                         <h3 className="font-semibold text-ink">Account</h3>
-                        <p className="text-xs text-ink-muted">Signed in as <span className="font-mono">{user?.username}</span></p>
+                        <p className="text-xs text-ink-muted">
+                            Signed in as <span className="font-mono">{user?.username}</span>
+                            {user?.isSuper && <span className="ml-2 inline-flex items-center gap-1 text-[10.5px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">★ Super admin</span>}
+                        </p>
                     </div>
                 </div>
 
@@ -1241,18 +1286,22 @@ function SettingsPanel({ user }) {
                 </form>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"><FiDatabase /></div>
-                    <div>
-                        <h3 className="font-semibold text-ink">Data backup</h3>
-                        <p className="text-xs text-ink-muted">Download a JSON snapshot of all enquiries and packages.</p>
+            <UsersManagementCard currentUser={user} />
+
+            {user?.isSuper && (
+                <div className="bg-white rounded-2xl p-6 shadow-sm">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"><FiDatabase /></div>
+                        <div>
+                            <h3 className="font-semibold text-ink">Data backup</h3>
+                            <p className="text-xs text-ink-muted">Download a JSON snapshot of all enquiries and packages.</p>
+                        </div>
                     </div>
+                    <button onClick={downloadBackup} className="btn-sm rounded-xl border border-slate-200 hover:bg-slate-50 text-ink">
+                        <FiDownload /> Download backup (.json)
+                    </button>
                 </div>
-                <button onClick={downloadBackup} className="btn-sm rounded-xl border border-slate-200 hover:bg-slate-50 text-ink">
-                    <FiDownload /> Download backup (.json)
-                </button>
-            </div>
+            )}
 
             <div className="bg-white rounded-2xl p-6 shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
@@ -1282,6 +1331,340 @@ function SettingsPanel({ user }) {
                 </dl>
             </div>
         </div>
+    );
+}
+
+/* =========================================================================
+ * Users management (super-admin only)
+ * ========================================================================= */
+
+const MODULE_META = {
+    enquiries:   { label: 'Enquiries',    icon: <FiInbox /> },
+    bookings:    { label: 'Bookings',     icon: <FiCreditCard /> },
+    packages:    { label: 'Packages',     icon: <FiPackage /> },
+    seasons:     { label: 'Seasons',      icon: <FiSun /> },
+    ads:         { label: 'Ads / Promo',  icon: <FiImage /> },
+    blogs:       { label: 'Blog Posts',   icon: <FiFileText /> },
+    destinations:{ label: 'Destinations', icon: <FiHome /> },
+    users:       { label: 'Users',        icon: <FiUsers /> },
+};
+
+const LEVEL_META = {
+    none:  { label: 'None',  cls: 'bg-slate-100 text-slate-500 border-slate-200' },
+    read:  { label: 'Read',  cls: 'bg-blue-50 text-blue-700 border-blue-200' },
+    write: { label: 'Write', cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+};
+
+function UsersManagementCard({ currentUser }) {
+    const [users, setUsers] = useState([]);
+    const [meta, setMeta] = useState({ modules: Object.keys(MODULE_META), levels: ['none', 'read', 'write'] });
+    const [loading, setLoading] = useState(true);
+    const [editing, setEditing] = useState(null); // null | 'new' | user object
+
+    const load = async () => {
+        setLoading(true);
+        const [r, m] = await Promise.all([api.adminUsers(), api.adminUsersMeta()]);
+        setLoading(false);
+        if (r.ok) setUsers(r.data.users);
+        else toast.error('Failed to load users');
+        if (m.ok) setMeta(m.data);
+    };
+
+    useEffect(() => { load(); }, []);
+
+    const onDelete = async (u) => {
+        if (u.id === currentUser?.id) return toast.error("Can't delete your own account");
+        if (!window.confirm(`Delete user "${u.username}"? This cannot be undone.`)) return;
+        const r = await api.adminDeleteUser(u.id);
+        if (!r.ok) {
+            const msg = r.error === 'last_super_admin' ? "Can't delete the last super-admin" :
+                r.error === 'cannot_delete_self' ? "Can't delete your own account" :
+                `Failed (${r.error})`;
+            return toast.error(msg);
+        }
+        toast.success('User deleted');
+        load();
+    };
+
+    const canManage = !!currentUser?.isSuper;
+
+    return (
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center"><FiUsers /></div>
+                <div className="flex-1">
+                    <h3 className="font-semibold text-ink">Admin users</h3>
+                    <p className="text-xs text-ink-muted">
+                        {canManage
+                            ? 'Create accounts for your team and choose what each one can access.'
+                            : 'Read-only — only super-admins can create or edit users.'}
+                    </p>
+                </div>
+                {canManage && (
+                    <button onClick={() => setEditing('new')} className="btn-sm rounded-xl bg-brand-500 text-white hover:bg-brand-600">
+                        <FiPlus /> Add user
+                    </button>
+                )}
+            </div>
+
+            {loading ? (
+                <div className="py-10 text-center text-ink-muted text-sm">Loading users…</div>
+            ) : users.length === 0 ? (
+                <div className="py-10 text-center text-ink-muted text-sm">No users yet.</div>
+            ) : (
+                <div className="border border-slate-200 rounded-xl overflow-hidden">
+                    <div className="grid grid-cols-[1fr_auto_auto_auto] gap-3 px-4 py-2.5 bg-slate-50 border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
+                        <div>User</div>
+                        <div className="hidden sm:block">Role</div>
+                        <div className="hidden sm:block">Status</div>
+                        <div className="text-right">Actions</div>
+                    </div>
+                    {users.map((u) => (
+                        <div key={u.id} className="grid grid-cols-[1fr_auto_auto_auto] gap-3 items-center px-4 py-3 border-b border-slate-100 last:border-b-0">
+                            <div className="min-w-0">
+                                <div className="font-display font-semibold text-ink text-sm truncate">
+                                    {u.displayName || u.username}
+                                    {u.id === currentUser?.id && <span className="ml-2 text-[10px] uppercase tracking-wider font-bold text-brand-500">You</span>}
+                                </div>
+                                <div className="text-[12px] text-ink-muted font-mono truncate">{u.username}</div>
+                                {!u.isSuper && (
+                                    <div className="flex flex-wrap gap-1 mt-1.5">
+                                        {meta.modules.map((m) => {
+                                            const lvl = (u.permissions || {})[m] || 'none';
+                                            if (lvl === 'none') return null;
+                                            return (
+                                                <span key={m} className={`inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded border ${LEVEL_META[lvl]?.cls || ''}`}>
+                                                    {MODULE_META[m]?.label || m} · {LEVEL_META[lvl]?.label || lvl}
+                                                </span>
+                                            );
+                                        })}
+                                        {meta.modules.every((m) => ((u.permissions || {})[m] || 'none') === 'none') && (
+                                            <span className="text-[11px] text-ink-muted italic">No module access</span>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="hidden sm:block">
+                                {u.isSuper ? (
+                                    <span className="inline-flex items-center gap-1 text-[10.5px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">★ Super</span>
+                                ) : (
+                                    <span className="inline-flex items-center text-[10.5px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">Staff</span>
+                                )}
+                            </div>
+                            <div className="hidden sm:block">
+                                <span className={`inline-flex items-center gap-1 text-[10.5px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full ${u.active ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
+                                    <span className={`w-1.5 h-1.5 rounded-full ${u.active ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                                    {u.active ? 'Active' : 'Disabled'}
+                                </span>
+                            </div>
+                            <div className="text-right flex items-center justify-end gap-1">
+                                {canManage && (
+                                    <>
+                                        <button onClick={() => setEditing(u)}
+                                            className="p-2 rounded-lg hover:bg-slate-100 text-slate-600 hover:text-brand-500" title="Edit">
+                                            <FiEdit2 size={14} />
+                                        </button>
+                                        <button onClick={() => onDelete(u)} disabled={u.id === currentUser?.id}
+                                            className="p-2 rounded-lg hover:bg-red-50 text-red-500 hover:text-red-600 disabled:opacity-30 disabled:hover:bg-transparent"
+                                            title={u.id === currentUser?.id ? "Can't delete yourself" : 'Delete'}>
+                                            <FiTrash2 size={14} />
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            <AnimatePresence>
+                {editing && (
+                    <UserEditorModal
+                        meta={meta}
+                        editing={editing === 'new' ? null : editing}
+                        onClose={() => setEditing(null)}
+                        onSaved={() => { setEditing(null); load(); }}
+                    />
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
+
+function UserEditorModal({ meta, editing, onClose, onSaved }) {
+    const isNew = !editing;
+    const [form, setForm] = useState(() => ({
+        username: editing?.username || '',
+        displayName: editing?.displayName || '',
+        password: '',
+        isSuper: !!editing?.isSuper,
+        active: editing ? editing.active !== false : true,
+        permissions: editing?.permissions || meta.modules.reduce((acc, m) => ({ ...acc, [m]: 'none' }), {}),
+    }));
+    const [busy, setBusy] = useState(false);
+
+    const setPerm = (mod, lvl) => setForm((f) => ({ ...f, permissions: { ...f.permissions, [mod]: lvl } }));
+    const setAll = (lvl) => setForm((f) => ({
+        ...f,
+        permissions: meta.modules.reduce((acc, m) => ({ ...acc, [m]: lvl }), {}),
+    }));
+
+    const submit = async (e) => {
+        e.preventDefault();
+        if (busy) return;
+        if (isNew && form.password.length < 8) return toast.error('Password must be at least 8 characters');
+        if (!isNew && form.password && form.password.length < 8) return toast.error('New password must be at least 8 characters');
+        setBusy(true);
+        const payload = {
+            username: form.username.trim(),
+            displayName: form.displayName.trim(),
+            isSuper: form.isSuper,
+            active: form.active,
+            permissions: form.permissions,
+        };
+        if (form.password) payload.password = form.password;
+
+        const r = isNew
+            ? await api.adminCreateUser(payload)
+            : await api.adminUpdateUser(editing.id, payload);
+        setBusy(false);
+        if (!r.ok) {
+            const msg = {
+                username_required: 'Username is required',
+                weak_password: 'Password must be at least 8 characters',
+                username_invalid_format: 'Username: letters, digits, dot, underscore, dash. 3–40 chars.',
+                username_taken: 'That username is already in use',
+                last_super_admin: "Can't demote the last super-admin",
+                not_found: 'User not found — refresh and try again',
+                cannot_deactivate_self: "Can't deactivate your own account",
+                forbidden_super_admin_only: 'Only super-admins can manage users',
+            }[r.error] || `Failed (${r.error})`;
+            return toast.error(msg);
+        }
+        toast.success(isNew ? 'User created' : 'User updated');
+        onSaved();
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+            onClick={onClose}
+        >
+            <motion.form
+                initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+                onSubmit={submit}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            >
+                <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+                    <div>
+                        <h3 className="font-display font-extrabold text-ink text-lg">{isNew ? 'Create user' : `Edit ${editing.username}`}</h3>
+                        <p className="text-xs text-ink-muted">{isNew ? 'New admin account with per-module permissions.' : 'Change permissions, role, password or status.'}</p>
+                    </div>
+                    <button type="button" onClick={onClose} className="p-2 rounded-lg hover:bg-slate-100">
+                        <FiX />
+                    </button>
+                </div>
+
+                <div className="p-6 space-y-5">
+                    <div className="grid sm:grid-cols-2 gap-3">
+                        <div>
+                            <label className="label">Username *</label>
+                            <input className="input" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })}
+                                disabled={!isNew} placeholder="e.g. priya.sharma" required />
+                            {!isNew && <p className="text-[11px] text-ink-muted mt-1">Username can't be changed after creation.</p>}
+                        </div>
+                        <div>
+                            <label className="label">Display name</label>
+                            <input className="input" value={form.displayName} onChange={(e) => setForm({ ...form, displayName: e.target.value })}
+                                placeholder="Priya Sharma" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="label">{isNew ? 'Password *' : 'Reset password (leave blank to keep current)'}</label>
+                        <input type="password" className="input" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })}
+                            placeholder={isNew ? 'Min. 8 characters' : 'Leave blank to keep current'} minLength={isNew ? 8 : 0} required={isNew} />
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <label className="flex items-start gap-3 cursor-pointer">
+                            <input type="checkbox" className="mt-1" checked={form.isSuper}
+                                onChange={(e) => setForm({ ...form, isSuper: e.target.checked })} />
+                            <div>
+                                <div className="font-display font-semibold text-ink text-sm">Super admin</div>
+                                <div className="text-[11.5px] text-ink-muted">Full access to everything + can manage users. Permissions below are ignored.</div>
+                            </div>
+                        </label>
+                        <label className="flex items-start gap-3 cursor-pointer">
+                            <input type="checkbox" className="mt-1" checked={form.active}
+                                onChange={(e) => setForm({ ...form, active: e.target.checked })} />
+                            <div>
+                                <div className="font-display font-semibold text-ink text-sm">Active</div>
+                                <div className="text-[11.5px] text-ink-muted">Disabled users can't sign in but their account is kept.</div>
+                            </div>
+                        </label>
+                    </div>
+
+                    {!form.isSuper && (
+                        <div>
+                            <div className="flex items-center justify-between mb-2">
+                                <label className="label !mb-0">Module permissions</label>
+                                <div className="flex items-center gap-1.5 text-[11px]">
+                                    <button type="button" onClick={() => setAll('none')} className="text-ink-muted hover:text-ink underline">All none</button>
+                                    <span className="text-slate-300">·</span>
+                                    <button type="button" onClick={() => setAll('read')} className="text-ink-muted hover:text-ink underline">All read</button>
+                                    <span className="text-slate-300">·</span>
+                                    <button type="button" onClick={() => setAll('write')} className="text-ink-muted hover:text-ink underline">All write</button>
+                                </div>
+                            </div>
+                            <div className="border border-slate-200 rounded-xl overflow-hidden">
+                                {meta.modules.map((mod) => {
+                                    const m = MODULE_META[mod] || { label: mod, icon: <FiSettings /> };
+                                    const isUsersMod = mod === 'users';
+                                    return (
+                                        <div key={mod} className="grid grid-cols-[1fr_auto] items-center px-4 py-2.5 border-b border-slate-100 last:border-b-0 gap-3">
+                                            <div className="flex items-center gap-2.5 min-w-0">
+                                                <span className="text-slate-500">{m.icon}</span>
+                                                <span className="font-display font-semibold text-ink text-sm truncate">{m.label}</span>
+                                                {isUsersMod && <span className="text-[10px] uppercase tracking-wider font-bold text-amber-600">Super only</span>}
+                                            </div>
+                                            <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-0.5">
+                                                {meta.levels.map((lvl) => {
+                                                    const active = (form.permissions[mod] || 'none') === lvl;
+                                                    const disabled = isUsersMod && lvl !== 'none'; // only supers can manage users
+                                                    return (
+                                                        <button key={lvl} type="button"
+                                                            disabled={disabled}
+                                                            onClick={() => setPerm(mod, lvl)}
+                                                            className={`px-2.5 py-1 text-[11.5px] font-display font-semibold rounded-md transition
+                                                                ${active ? 'bg-white shadow text-ink' : 'text-ink-muted hover:text-ink'}
+                                                                ${disabled ? 'opacity-30 cursor-not-allowed' : ''}`}>
+                                                            {LEVEL_META[lvl]?.label || lvl}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            <p className="text-[11px] text-ink-muted mt-2">
+                                <strong>Read</strong> = view-only · <strong>Write</strong> = create / edit / delete · <strong>None</strong> = the section is hidden from this user.
+                            </p>
+                        </div>
+                    )}
+                </div>
+
+                <div className="sticky bottom-0 bg-white border-t border-slate-200 px-6 py-3 flex items-center justify-end gap-2">
+                    <button type="button" onClick={onClose} className="btn-sm rounded-xl border border-slate-200 hover:bg-slate-50 text-ink">Cancel</button>
+                    <button disabled={busy} type="submit" className="btn-sm rounded-xl bg-brand-500 text-white hover:bg-brand-600 disabled:opacity-60">
+                        <FiSave /> {busy ? 'Saving…' : (isNew ? 'Create user' : 'Save changes')}
+                    </button>
+                </div>
+            </motion.form>
+        </motion.div>
     );
 }
 
